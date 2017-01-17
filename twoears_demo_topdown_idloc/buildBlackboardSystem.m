@@ -43,7 +43,7 @@ if bIdentifySources
                fullfile( dirSegr, segmModelFileName ), ...
                'f' );
     fprintf( '.' );
-    nsrcs = bbs.createKS( 'NumberOfSourcesKS', {'nSrcs','learned_models/NumberOfSourcesKS/mc3_models_dataset_1',ppRemoveDc} );
+    nsrcs = bbs.createKS( 'NumberOfSourcesKS', {'nSrcs_fc5','learned_models/NumberOfSourcesKS/mc3_models_dataset_1',ppRemoveDc} );
     fprintf( '.' );
     segment = bbs.createKS( 'StreamSegregationKS', ...
         {cleanPathFromRelativeRefs( [pwd '/../../AMLTTP/test/SegmentationTrainerParameters5.yaml'] )} );
