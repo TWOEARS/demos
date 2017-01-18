@@ -19,7 +19,7 @@ locDecisionKS = bbs.createKS('LocalisationDecisionKS', {bSolveConfusion, 0.5});
 rotateKS = bbs.createKS('HeadRotationKS', {robot});
 
 %%
-ppRemoveDc = false;
+ppRemoveDc = false; 
 %idLeakFactor = 0.5;
 %idClassThresholds.fire = 0.8;
 segIdClassThresholds.fire = 0.4;

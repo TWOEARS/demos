@@ -143,10 +143,7 @@ classdef DemoController < handle
             
             if obj.bSimulation
 
-                sourceSets{1} = {'alarm'};
-                sourceSets{2} = {'fire'};
-                sourceSets{3} = {'alarm', 'fire'};
-                % sourceSets{4} = {'female', 'fire'};
+                [sourceSets, sourceVolumes] = setupScenes;
 
                 for ii = 1:length(sourceSets)
 
@@ -154,7 +151,7 @@ classdef DemoController < handle
                     obj.reset();
 
                     sourceList = sourceSets{ii};
-                    [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList);
+                    [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList, sourceVolumes{ii});
                     nSources = length(refAzimuths);
                     % Plot ground true source positions
                     for jj = 1:nSources

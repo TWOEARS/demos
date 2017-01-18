@@ -1,8 +1,15 @@
-function [sim,refAzimuths,robotOrientation] = setupBinauralSimulator(sourceList)
+function [sim,refAzimuths,robotOrientation] = setupBinauralSimulator(sourceList, sourceVolumes)
 %
 %
 % sourceList = {'alarm', 'fire', 'male', 'female'}
 %
+
+% Number of sources
+nSources = length(sourceList);
+if nargin < 2
+    sourceVolumes = ones(nSources,1);
+end
+
 brirs = {...
     'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos1.sofa'; ...
     'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos2.sofa'; ...
@@ -20,8 +27,6 @@ nsteps = size(brir.ListenerView, 1);
 robotPos = SOFAconvertCoordinates(brir.ListenerView(ceil(nsteps/2),:),'cartesian','spherical');
 robotOrientation = robotPos(1); % World frame
 
-% Number of sources
-nSources = length(sourceList);
 
 % Initialise binaural simulator
 sim = simulator.SimulatorConvexRoom();
@@ -73,7 +78,8 @@ set(sim.Sinks, 'Name', 'Head');
 for n = 1:nSources
     set(sim.Sources{n}, ...
         'AudioBuffer', simulator.buffer.Ring(1), ...
-        'Name', sourceList{n});
+        'Name', sourceList{n}, ...
+        'Volume', sourceVolumes(n));
     sim.Sources{n}.AudioBuffer.loadFile(...
         sprintf('../audio/%s.wav', sourceList{n}), ...
         sim.SampleRate);
