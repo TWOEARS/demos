@@ -27,7 +27,7 @@ classdef RobotRecording < simulator.RobotInterface
     methods (Access = public)
         function obj = RobotRecording()
             
-            [obj.binaural, obj.SampleRate] = audioread('train_source_GMMs/Jido_recordings/jido_rec_mixed.wav');
+            [obj.binaural, obj.SampleRate] = audioread('../audio/jido_rec_mixed.wav');
             obj.sampleIndex = 0;
             obj.BlockSize = 0.5 * obj.SampleRate;
             
