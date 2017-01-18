@@ -1,19 +1,19 @@
-function testToulouseBRIRs
+function testToulouseBRIRs(sceneNums)
 
 
 locVis = VisualiserIdentityLocalisation;
-sigLen = 10;
+sigLen = 5;
 
 
-sourceSets{1} = {'alarm'};
-sourceSets{2} = {'fire'};
-sourceSets{3} = {'alarm', 'fire'};
-                    % sourceSets{4} = {'female', 'fire'};
-                    
-for ii = 3:length(sourceSets)
+[sourceSets, sourceVolumes] = setupScenes;
+if nargin < 1
+    sceneNums = 1:length(sourceSets);
+end
+
+for ii = sceneNums
 
     sourceList = sourceSets{ii};
-    [robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList);
+    [robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList,sourceVolumes{ii});
     nSources = length(refAzimuths);
     % Plot ground true source positions
     for jj = 1:nSources
@@ -28,7 +28,7 @@ for ii = 3:length(sourceSets)
     robot.Init = true;
     sig = robot.getSignal(sigLen);
     soundsc(sig, 44100);
-    pause(sigLen);
+    pause;
 
     robot.shutdown();
     locVis.reset;

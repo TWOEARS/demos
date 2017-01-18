@@ -101,18 +101,15 @@ classdef DemoController < handle
             switch obj.demoMode
                 case 'sim'
                 
-                    sourceSets{1} = {'alarm'};
-                    sourceSets{2} = {'fire'};
-                    sourceSets{3} = {'alarm', 'fire'};
-                    % sourceSets{4} = {'female', 'fire'};
+                    [sourceSets, sourceVolumnes] = setupScenes;
                     
-                    for ii = 3:length(sourceSets)
+                    for ii = 1:length(sourceSets)
 
                         % Reset controller
                         obj.reset();
                         
                         sourceList = sourceSets{ii};
-                        [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList);
+                        [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList, sourceVolumnes{ii});
                         nSources = length(refAzimuths);
                         % Plot ground true source positions
                         for jj = 1:nSources
