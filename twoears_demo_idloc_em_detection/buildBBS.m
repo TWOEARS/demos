@@ -28,7 +28,7 @@ idClassThresholds.fire = 0.8;
 segIdClassThresholds.fire = 0.8;
 segIdLeakFactor = 0.25;
 segIdGaussWidth = 10;
-segIdMaxObjects = 3;
+segIdMaxObjects = 2;
 idLeakFactor = 0.5;
 %%
 if strcmp(runningMode, 'segStream')
@@ -107,6 +107,33 @@ elseif strcmp(runningMode, 'fullAndSegStream')
         idKss{ii}.setInvocationFrequency(10);
     end  
     collectId = bbs.createKS('IntegrateFullstreamIdentitiesKS', {idLeakFactor,inf,idClassThresholds});
+elseif strcmp(runningMode, 'emDet')
+    %% Identifcation on segregated streams
+    addPathsIfNotIncluded( {...
+        cleanPathFromRelativeRefs( [pwd '/../../segmentation-training-pipeline/src'] ), ...
+        cleanPathFromRelativeRefs( [pwd '/../../segmentation-training-pipeline/external/data-hash'] ), ...
+        cleanPathFromRelativeRefs( [pwd '/../../segmentation-training-pipeline/external/yaml-matlab'] ) ...
+        } );
+    segmModelFileName = '70c4feac861e382413b4c4bfbf895695.mat';
+    dirSegr = fullfile( db.tmp, 'learned_models', 'SegmentationKS' );
+    if ~exist(dirSegr, 'dir')
+        mkdir( dirSegr );
+    end
+    copyfile(  cleanPathFromRelativeRefs( [pwd '/../../AMLTTP/test/' segmModelFileName] ), ...
+               fullfile( dirSegr, segmModelFileName ), ...
+               'f' );
+    fprintf( '.' );
+    nsrcs = bbs.createKS( 'NumberOfSourcesKS', {'nSrcs_fc5','learned_models/NumberOfSourcesKS/mc3_models_dataset_1',ppRemoveDc} );
+    fprintf( '.' );
+    segment = bbs.createKS( 'StreamSegregationKS', ...
+        {cleanPathFromRelativeRefs( [pwd '/../../AMLTTP/test/SegmentationTrainerParameters5.yaml'] )} );
+    fprintf( '.' );
+    for ii = 1 : numel( idSegModels )
+        idSegKss{ii} = bbs.createKS('SegmentIdentityKS', {idSegModels(ii).name, idSegModels(ii).dir, ppRemoveDc});
+        fprintf( '.' );
+        idSegKss{ii}.setInvocationFrequency(10);
+    end
+    collectSegId = bbs.createKS('IntegrateSegregatedIdentitiesKS', {segIdLeakFactor,segIdGaussWidth,segIdMaxObjects,segIdClassThresholds});
 end
 %% knowledge source binding
 bbs.blackboardMonitor.bind({bbs.scheduler}, {bbs.dataConnect}, 'replaceOld', 'AgendaEmpty' );
@@ -118,7 +145,6 @@ if strcmp(runningMode, 'segStream')
     bbs.blackboardMonitor.bind({nsrcs}, {segment}, 'replaceOld' );
     bbs.blackboardMonitor.bind({segment}, idSegKss, 'replaceOld' );
     bbs.blackboardMonitor.bind({idSegKss{end}}, {collectSegId}, 'replaceOld' );
-    bbs.blackboardMonitor.bind({collectSegId}, {emDet}, 'replaceOld' );
 elseif strcmp(runningMode, 'jointCNN')
     bbs.blackboardMonitor.bind({bbs.dataConnect}, {cnn}, 'replaceOld' );
     bbs.blackboardMonitor.bind({cnn}, {idLocDec}, 'replaceOld' );
@@ -132,5 +158,11 @@ elseif strcmp(runningMode, 'fullAndSegStream')
     bbs.blackboardMonitor.bind({idKss{end}}, {collectId}, 'replaceOld' );    
 elseif strcmp(runningMode, 'fullStream')
     bbs.blackboardMonitor.bind({bbs.dataConnect}, idKss, 'replaceOld' );
-    bbs.blackboardMonitor.bind({idKss{end}}, {collectId}, 'replaceOld' );    
+    bbs.blackboardMonitor.bind({idKss{end}}, {collectId}, 'replaceOld' );
+elseif strcmp(runningMode, 'emDet')
+    bbs.blackboardMonitor.bind({locDec}, {nsrcs}, 'replaceOld' );
+    bbs.blackboardMonitor.bind({nsrcs}, {segment}, 'replaceOld' );
+    bbs.blackboardMonitor.bind({segment}, idSegKss, 'replaceOld' );
+    bbs.blackboardMonitor.bind({idSegKss{end}}, {collectSegId}, 'replaceOld' );
+    bbs.blackboardMonitor.bind({collectSegId}, {emDet}, 'replaceOld' );
 end
