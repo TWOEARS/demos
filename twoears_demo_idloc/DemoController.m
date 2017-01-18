@@ -193,7 +193,7 @@ classdef DemoController < handle
             else
                 % Reset controller
                 obj.reset();
-                
+                  
                 % Start the real rebot
                 obj.robot.start();
                 
