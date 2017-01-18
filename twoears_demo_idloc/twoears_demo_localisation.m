@@ -90,7 +90,12 @@ set(handles.checkboxFrontalPlane, 'Enable', 'off');
 set(handles.checkboxHeadRotation, 'Enable', 'off');
 set(handles.checkboxFullBodyRotation, 'Enable', 'off');
 % Start blackboard
-handles.ctrl.startBlackboard;
+try
+   handles.ctrl.startBlackboard;
+catch ME
+   close all;
+   rethrow(ME);
+end
 
 set(hObject, 'Enable', 'on');
 set(handles.pushbuttonStop, 'Enable', 'off');

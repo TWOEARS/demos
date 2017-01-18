@@ -142,67 +142,54 @@ classdef DemoController < handle
             end
             
             if obj.bSimulation
-                
-                for ii = 1:length(obj.brirs)
 
-                    % Get metadata from BRIR
-                    brir = SOFAload(db.getFile(obj.brirs{ii}), 'nodata');
+                sourceSets{1} = {'alarm'};
+                sourceSets{2} = {'fire'};
+                sourceSets{3} = {'alarm', 'fire'};
+                % sourceSets{4} = {'female', 'fire'};
 
-                    % Get 0 degree look head orientation from BRIR
-                    nsteps = size(brir.ListenerView, 1);
-                    robotPos = SOFAconvertCoordinates(brir.ListenerView(ceil(nsteps/2),:),'cartesian','spherical');
-                    robotOrientation = robotPos(1); % World frame
+                for ii = 1:length(sourceSets)
+
+                    % Reset controller
+                    obj.reset();
+
+                    sourceList = sourceSets{ii};
+                    [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList);
+                    nSources = length(refAzimuths);
+                    % Plot ground true source positions
+                    for jj = 1:nSources
+                        obj.locVis.plotMarkerAtAngle(jj, refAzimuths(jj), sourceList{jj});
+                    end
 
                     fprintf('Robot position %d: %.0f degrees (world)\n', ii, robotOrientation);
 
-                    for jj = 1:size(brir.EmitterPosition,1) % loop over all loudspeakers
+                    obj.robot.rotateHead(0, 'absolute');
+                    obj.robot.moveRobot(0, 0, robotOrientation, 'absolute');
+                    obj.robot.Init = true;
+                    obj.robot.start();
 
-                        obj.robot = setupBinauralSimulator();
-                        
-                        % Get source direction from BRIR
-                        y = brir.EmitterPosition(jj, 2) - brir.ListenerPosition(2);
-                        x = brir.EmitterPosition(jj, 1) - brir.ListenerPosition(1);
-                        refAzi = atan2d(y, x) - robotOrientation; % Reference azimuth
+                    % Create blackboard
+                    obj.bbs = buildBBS(obj.robot, ...
+                        obj.bFrontLocationOnly, ...
+                        obj.bSolveConfusion, ...
+                        obj.bFullBodyRotation,...
+                        idModels, segidModels, ...
+                        ppRemoveDc, idFs, obj.runningMode);
+                    % Set energy threshold for detecting valid frames
+                    obj.bbs.setEnergyThreshold(obj.energyThresholdSimulation);
 
-                        % Reset controller
-                        obj.reset();
-                        
-                        % Plot a marker at the reference azimuth
-                        if strcmp(obj.runningMode, 'locOnly')
-                            obj.locVis.plotMarkerAtAngle(refAzi);
-                        end
+                    % Set visualisers
+                    obj.bbs.setVisualiser(obj.bbVis);
+                    obj.bbs.setLocVis(obj.locVis);
+                    obj.bbs.setAfeVis(obj.afeVis);
 
-                        % Load new BRIRs and initialise binaural simulator
-                        obj.robot.Sources{1}.IRDataset = simulator.DirectionalIR(obj.brirs{ii}, jj);
-                        obj.robot.rotateHead(0, 'absolute');
-                        obj.robot.moveRobot(0, 0, robotOrientation, 'absolute');
-                        obj.robot.Init = true;
-                        obj.robot.start();
-                        
-                        % Create blackboard
-                        obj.bbs = buildBBS(obj.robot, ...
-                            obj.bFrontLocationOnly, ...
-                            obj.bSolveConfusion, ...
-                            obj.bFullBodyRotation,...
-                            idModels, segidModels, ...
-                            ppRemoveDc, idFs, obj.runningMode);
-                        % Set energy threshold for detecting valid frames
-                        obj.bbs.setEnergyThreshold(obj.energyThresholdSimulation);
+                    % Run the blackboard system
+                    obj.bbs.run();
 
-                        % Set visualisers
-                        obj.bbs.setVisualiser(obj.bbVis);
-                        obj.bbs.setLocVis(obj.locVis);
-                        obj.bbs.setAfeVis(obj.afeVis);
+                    obj.robot.shutdown();
 
-                        % Run the blackboard system
-                        obj.bbs.run();
-
-                        obj.robot.shutdown();
-
-                        if obj.bStopNow
-                            return;
-                        end
-
+                    if obj.bStopNow
+                        return;
                     end
                 end
                 % End of the simulation
