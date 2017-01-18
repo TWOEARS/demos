@@ -90,7 +90,13 @@ set(handles.checkboxFrontalPlane, 'Enable', 'off');
 set(handles.checkboxIdentifySources, 'Enable', 'off');
 
 % Start blackboard
-handles.ctrl.startBlackboard;
+try
+   handles.ctrl.startBlackboard;
+catch ME
+   close all;
+   rethrow(ME);
+end
+
 
 set(hObject, 'Enable', 'on');
 set(handles.pushbuttonStop, 'Enable', 'off');
