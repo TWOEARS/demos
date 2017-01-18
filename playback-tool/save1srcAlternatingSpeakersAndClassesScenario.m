@@ -16,9 +16,9 @@ flEngine = fullfile( pwd, 'engine.flist' );
 flDog = fullfile( pwd, 'dog.flist' );
 
 scDef = struct();
-scDef.s1.flist = {{flFScream}};
-scDef.s1.onsetDelay = {2.0};
-scDef.s1.inbetweenFilesGap = {1.0};
+%scDef.s1.flist = {{flFScream}};
+%scDef.s1.onsetDelay = {2.0};
+%scDef.s1.inbetweenFilesGap = {1.0};
 scDef.s2.flist = {{flMale}};
 scDef.s2.onsetDelay = {34.0};
 scDef.s2.inbetweenFilesGap = {0.0};
@@ -30,8 +30,20 @@ scDef.s4.onsetDelay = {183.0};
 scDef.s4.inbetweenFilesGap = {0.0};
 scDef.length = 400; % seconds
 
-%scenario = produceScenario( scDef );
-%save('Sc1-OneSrcAltSpkrsClasses.mat', 'scenario');
+scenario = produceScenario( scDef );
+save('scenarios/Sc1-OneSrcAltSpkrsClasses_2017.mat', 'scenario');
+
+%%
+
+scDef = struct();
+scDef.s2.flist = {{flBaby}};
+scDef.s2.onsetDelay = {2.0};
+scDef.s2.inbetweenFilesGap = {1.0};
+scDef.length = 60; % secondsq
+
+scenario = produceScenario( scDef );
+save('scenarios/Sc1-baby.mat', 'scenario');
+%%
 
 scDef = struct();
 scDef.s2.flist = {{flMale};{flFemale};{flMale};{flFemale};{flMale};{flFemale};{flMale};{flFemale};{flMale};{flFemale}};
@@ -40,7 +52,7 @@ scDef.s2.inbetweenFilesGap = {0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0};
 scDef.length = 600; % seconds
 
 scenario = produceScenario( scDef );
-save('Sc1-SpeechSp2.mat', 'scenario');
+save('scenarios/Sc1-SpeechSp2.mat', 'scenario');
 
 scDef = struct();
 scDef.s1.flist = {{flFire};{flFire}};
@@ -49,7 +61,7 @@ scDef.s1.inbetweenFilesGap = {0.0;0.0};
 scDef.length = 600; % seconds
 
 scenario = produceScenario( scDef );
-save('Sc1-FireSp1.mat', 'scenario');
+save('scenarios/Sc1-FireSp1.mat', 'scenario');
 
 scDef = struct();
 scDef.s2.flist = {{flAlarm};{flPhone};{flAlarm};{flPhone};{flAlarm};{flPhone}};
@@ -58,6 +70,6 @@ scDef.s2.inbetweenFilesGap = {0.0;0.0;0.0;0.0;0.0;0.0};
 scDef.length = 600; % seconds
 
 scenario = produceScenario( scDef );
-save('Sc1-AlarmPhoneSp2.mat', 'scenario');
+save('scenarios/Sc1-AlarmPhoneSp2.mat', 'scenario');
 
 end

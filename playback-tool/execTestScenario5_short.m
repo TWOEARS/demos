@@ -1,7 +1,7 @@
 function execTestScenario5_short()
 
-flAlarm = fullfile( pwd, 'alarm.flist' );
-flFire = fullfile( pwd, 'fire.flist' );
+flAlarm = fullfile( pwd, 'alarm_2017.flist' );
+flFire = fullfile( pwd, 'fire_2017.flist' );
 flFemale = fullfile( pwd, 'female_short.flist' );
 flFScream = fullfile( pwd, 'fScream.flist' );
 flBaby = fullfile( pwd, 'baby.flist' );
@@ -25,17 +25,17 @@ scDef.s1.flist = {{flPiano};{flFire}};
 scDef.s1.onsetDelay = {2.0;5.0};
 scDef.s1.inbetweenFilesGap = {1.0;0.5};
 scDef.s2.flist = {{flPhone};{flAlarm}};
-scDef.s2.onsetDelay = {8.0; 0.0};
-scDef.s2.inbetweenFilesGap = {10.0; 2.0};
+scDef.s2.onsetDelay = {1.0; 0.0};
+scDef.s2.inbetweenFilesGap = {2.0; 1.0};
 scDef.s3.flist = {{flMale}; {flBaby}};
-scDef.s3.onsetDelay = {11.0; 1.0};
-scDef.s3.inbetweenFilesGap = {7.0;4.0};
+scDef.s3.onsetDelay = {11.0; 40.0};
+scDef.s3.inbetweenFilesGap = {5.0;1.0};
 scDef.s4.flist = {{flFemale};{flFScream}};
 scDef.s4.onsetDelay = {1.0;30.0};
-scDef.s4.inbetweenFilesGap = {4.0;7.0};
+scDef.s4.inbetweenFilesGap = {4.0;1.0};
 scDef.length = 140; % seconds
 
 scenario = produceScenario( scDef );
-save('scenarios/scenario5_short.mat', 'scenario');
+save('scenarios/Sc5_short.mat', 'scenario');
 
 end

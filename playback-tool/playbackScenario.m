@@ -17,10 +17,11 @@ playrec('init', Fs, deviceId, -1)
 vis = VisualiserLayout();
 set(gcf,'CurrentCharacter','@');
 playrec('play', scenario.mix, channelAssignment)
+
+scenario_dur = max(scenario.onOffs(:,2));
 tic;
 
 elapsed_sec = 0;
-scenario_dur = max(scenario.onOffs(:,2));
 while elapsed_sec <= scenario_dur
     vis.updateSpeakerText(elapsed_sec, ...
         scenario.onOffs, ...
