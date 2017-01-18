@@ -151,7 +151,7 @@ classdef DemoController < handle
                     obj.reset();
 
                     sourceList = sourceSets{ii};
-                    [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList, sourceVolumes(ii));
+                    [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList, sourceVolumes{ii});
                     nSources = length(refAzimuths);
                     % Plot ground true source positions
                     for jj = 1:nSources
