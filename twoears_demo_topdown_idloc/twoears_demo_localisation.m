@@ -100,6 +100,8 @@ end
 
 set(hObject, 'Enable', 'on');
 set(handles.pushbuttonStop, 'Enable', 'off');
+set(handles.checkboxFrontalPlane, 'Enable', 'on');
+set(handles.checkboxIdentifySources, 'Enable', 'on');
 
 % --- Executes on button press in checkboxHeadRotation.
 function checkboxHeadRotation_Callback(hObject, eventdata, handles)
