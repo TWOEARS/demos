@@ -201,6 +201,8 @@ switch val
         handles.ctrl.runningMode = 'jointCNN';
     case 5 % 
         handles.ctrl.runningMode = 'fullAndSegStream';
+    case 6 %
+        handles.ctrl.runningMode = 'emDet';
 end
 
 
