@@ -22,7 +22,7 @@ function varargout = twoears_demo_localisation(varargin)
 
 % Edit the above text to modify the response to help twoears_demo_localisation
 
-% Last Modified by GUIDE v2.5 05-Dec-2016 14:41:14
+% Last Modified by GUIDE v2.5 18-Jan-2017 18:40:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -252,3 +252,11 @@ function checkboxIdentifySources_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkboxIdentifySources
 handles.ctrl.setIdentifySources(get(hObject,'Value'));
+
+
+% --- Executes on button press in pushbutton5.
+function pushbutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.ctrl.moveToInitialPosition();

@@ -56,6 +56,10 @@ classdef DemoController < handle
             obj.setDemoMode('sim');
         end
         
+        function moveToInitialPosition(obj)
+            obj.robot.moveRobot(91, 102, 180, 'absolute');
+        end
+        
         % Setup Robot
         function success = setupRobot(obj)
             success = true;
