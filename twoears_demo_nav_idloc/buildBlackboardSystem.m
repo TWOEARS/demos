@@ -1,4 +1,4 @@
-function [bbs, locDecisionKS, segKS] = buildBlackboardSystem(robot, bFrontLocationOnly, bSolveConfusion, bIdentifySources, idSegModels, fsHz)
+function [bbs, locDecisionKS, segKS, navKS] = buildBlackboardSystem(robot, bFrontLocationOnly, bSolveConfusion, bIdentifySources, idSegModels, fsHz)
 
 if ~exist('fsHz', 'var')
     fsHz = 16000;

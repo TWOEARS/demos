@@ -87,7 +87,6 @@ function pushbuttonDoLocalisation_Callback(hObject, eventdata, handles)
 set(hObject, 'Enable', 'off');
 set(handles.pushbuttonStop, 'Enable', 'on');
 set(handles.checkboxFrontalPlane, 'Enable', 'off');
-set(handles.checkboxIdentifySources, 'Enable', 'off');
 
 % Start blackboard
 try
@@ -101,7 +100,6 @@ end
 set(hObject, 'Enable', 'on');
 set(handles.pushbuttonStop, 'Enable', 'off');
 set(handles.checkboxFrontalPlane, 'Enable', 'on');
-set(handles.checkboxIdentifySources, 'Enable', 'on');
 
 % --- Executes on button press in checkboxHeadRotation.
 function checkboxHeadRotation_Callback(hObject, eventdata, handles)

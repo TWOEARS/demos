@@ -10,6 +10,7 @@ classdef DemoController < handle
         bbs;
         segKS;    % FactorialSourceModelKS
         locDecKS; % LocalisastionDecisionKS
+        navKS;
         targetSource = [];
         
         robot; 
@@ -123,7 +124,7 @@ classdef DemoController < handle
                         obj.robot.start();
 
                         % Create blackboard
-                        [obj.bbs, obj.locDecKS, obj.segKS] = buildBlackboardSystem(obj.robot, ...
+                        [obj.bbs, obj.locDecKS, obj.segKS, obj.navKS] = buildBlackboardSystem(obj.robot, ...
                             obj.bFrontLocationOnly, ...
                             obj.bSolveConfusion, ...
                             obj.bIdentifySources, ...
@@ -159,7 +160,7 @@ classdef DemoController < handle
                     obj.robot.start();
 
                     % Create blackboard
-                    [obj.bbs, obj.locDecKS, obj.segKS] = buildBlackboardSystem(...
+                    [obj.bbs, obj.locDecKS, obj.segKS, obj.navKS] = buildBlackboardSystem(...
                         obj.robot, ...
                         obj.bFrontLocationOnly, ...
                         obj.bSolveConfusion, ...
@@ -199,6 +200,9 @@ classdef DemoController < handle
             obj.targetSource = source;
             if ~isempty(obj.segKS)
                 obj.segKS.setTargetSource(source);
+            end
+            if ~isempty(obj.navKS)
+                obj.navKS.setTargetSource(source);
             end
         end
         
