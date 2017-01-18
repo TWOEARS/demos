@@ -26,7 +26,7 @@ idClassThresholds.fire = 0.8;
 segIdClassThresholds.fire = 0.8;
 segIdLeakFactor = 0.25;
 segIdGaussWidth = 10;
-segIdMaxObjects = 3;
+segIdMaxObjects = 2;
 idLeakFactor = 0.5;
 %%
 if strcmp(runningMode, 'segStream')
