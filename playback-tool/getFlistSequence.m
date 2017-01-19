@@ -9,7 +9,7 @@ fpath_base = fullfile( dst_dir, [fname_set num2str( gap_sec )] );
 fpath_wav_concat = [fpath_base '.wav'];
 fpath_metadata = [fpath_base '.mat'];
 
-if exist( fpath_wav_concat, 'file' ), return; end
+%if exist( fpath_wav_concat, 'file' ), return; end
 
 %%
 fid = fopen( flist );

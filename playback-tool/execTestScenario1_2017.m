@@ -22,17 +22,17 @@ scDef.s1.onsetDelay = {1.0; 0.0; 0.0; 0.0};
 scDef.s1.inbetweenFilesGap = {0.0; 0.0; 0.0; 0.0};
 scDef.length = 120; % seconds
 
-scenario = produceScenario( scDef );
-save('scenarios/01_scenario1_maleSp1_2017.mat', 'scenario');
-
-scDef = struct();
-scDef.s2.flist = {{flMale}; {flMale}; {flMale}; {flMale}; {flMale}; {flMale}};
-scDef.s2.onsetDelay = {1.0; 0.0; 0.0; 0.0; 0.0; 0.0};
-scDef.s2.inbetweenFilesGap = {0.0; 0.0; 0.0; 0.0; 0.0; 0.0};
-scDef.length = 120; % seconds
-
-scenario = produceScenario( scDef );
-save('scenarios/02_scenario1_maleSp2_2017.mat', 'scenario');
+% scenario = produceScenario( scDef );
+% save('scenarios/01_scenario1_maleSp1_2017.mat', 'scenario');
+% 
+% scDef = struct();
+% scDef.s2.flist = {{flMale}; {flMale}; {flMale}; {flMale}; {flMale}; {flMale}};
+% scDef.s2.onsetDelay = {1.0; 0.0; 0.0; 0.0; 0.0; 0.0};
+% scDef.s2.inbetweenFilesGap = {0.0; 0.0; 0.0; 0.0; 0.0; 0.0};
+% scDef.length = 120; % seconds
+% 
+% scenario = produceScenario( scDef );
+% save('scenarios/02_scenario1_maleSp2_2017.mat', 'scenario');
 
 scDef = struct();
 scDef.s1.flist = {{flAlarm}; {flAlarm}; {flAlarm}; {flAlarm}; {flAlarm}; {flAlarm}};
