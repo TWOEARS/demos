@@ -57,6 +57,7 @@ classdef DemoController < handle
         end
         
         function moveToInitialPosition(obj)
+            obj.robot.rotateHead(0, 'absolute');
             obj.robot.moveRobot(91, 102, 180, 'absolute');
         end
         
