@@ -1,7 +1,7 @@
 function [sig, fsHz] = testToulouseBRIRs(sourceList, sourceVolumes)
 
 fsHz = 44100;
-sigLen = 10;
+sigLen = 5;
 
 [robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList,sourceVolumes);
 %nSources = length(refAzimuths);

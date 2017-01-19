@@ -87,7 +87,7 @@ function pushbuttonDoLocalisation_Callback(hObject, eventdata, handles)
 set(hObject, 'Enable', 'off');
 set(handles.pushbuttonStop, 'Enable', 'on');
 set(handles.checkboxFrontalPlane, 'Enable', 'off');
-set(handles.checkboxHeadRotation, 'Enable', 'off');
+%set(handles.checkboxHeadRotation, 'Enable', 'off');
 set(handles.checkboxFullBodyRotation, 'Enable', 'off');
 % Start blackboard
 try
@@ -110,7 +110,7 @@ function checkboxHeadRotation_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkboxHeadRotation
-handles.ctrl.bSolveConfusion = get(hObject,'Value');
+handles.ctrl.setSolveConfusion(get(hObject,'Value'));
 if handles.ctrl.bSolveConfusion
     set(handles.checkboxFullBodyRotation, 'Enable', 'on');
     set(handles.checkboxFullBodyRotation, 'Value', handles.ctrl.bFullBodyRotation);
@@ -165,8 +165,9 @@ function pushbuttonStop_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles.ctrl.stop;
-set(hObject, 'Enable', 'off');
-set(handles.pushbuttonDoLocalisation, 'Enable', 'on');
+%set(hObject, 'Enable', 'off');
+%set(handles.pushbuttonDoLocalisation, 'Enable', 'on');
+
 set(handles.checkboxFrontalPlane, 'Enable', 'on');
 set(handles.checkboxHeadRotation, 'Enable', 'on');
 if handles.ctrl.bSolveConfusion

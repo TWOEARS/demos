@@ -28,9 +28,9 @@ classdef DemoController < handle
         
         
         % Define localisation demo parameters
-        bSolveConfusion = false; % flag for rotating head/body during localisation to solve confusion
+        bSolveConfusion = true; % flag for rotating head/body during localisation to solve confusion
         bFrontLocationOnly = false; % flag for localiation in the frontal plane only   
-        bIdentifySources = true; % flag for performing source identification
+        bIdentifySources = false; % flag for performing source identification
         
         demoMode = 'sim'; % 'sim', 'recording' or 'jido'
         
@@ -122,13 +122,17 @@ classdef DemoController < handle
                         obj.robot.moveRobot(0, 0, robotOrientation, 'absolute');
                         obj.robot.Init = true;
                         obj.robot.start();
+                        
+                        sig = obj.robot.getSignal(10);
+                        fsHz = 44100;
 
                         % Create blackboard
                         [obj.bbs, obj.locDecKS, obj.segKS] = buildBlackboardSystem(obj.robot, ...
                             obj.bFrontLocationOnly, ...
                             obj.bSolveConfusion, ...
                             obj.bIdentifySources, ...
-                            segidModels);
+                            segidModels, ...
+                            'ADREAM-SIM');
 
                         obj.segKS.setTargetSource(obj.targetSource);
                         obj.segKS.setBackgroundSource(obj.backgroundSource);
@@ -141,6 +145,9 @@ classdef DemoController < handle
                         obj.bbs.setLocVis(obj.locVis);
                         obj.bbs.setAfeVis(obj.afeVis);
 
+                        pause;
+                        soundsc(sig,fsHz);
+                        
                         % Run the blackboard system
                         obj.bbs.run();
 

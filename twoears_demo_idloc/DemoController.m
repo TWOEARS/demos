@@ -9,6 +9,7 @@ classdef DemoController < handle
         % Define blackboard system
         bbs;
         robot; 
+        locDecKS;
         bbVis;  % visualiser for blackboard
         afeVis; % visualiser for AFE
         locVis; % visualiser for Localisation
@@ -165,8 +166,11 @@ classdef DemoController < handle
                     obj.robot.Init = true;
                     obj.robot.start();
 
+                    sig = obj.robot.getSignal(10);
+                    fsHz = 44100;
+                        
                     % Create blackboard
-                    obj.bbs = buildBBS(obj.robot, ...
+                    [obj.bbs, obj.locDecKS] = buildBBS(obj.robot, ...
                         obj.bFrontLocationOnly, ...
                         obj.bSolveConfusion, ...
                         obj.bFullBodyRotation,...
@@ -180,13 +184,16 @@ classdef DemoController < handle
                     obj.bbs.setLocVis(obj.locVis);
                     obj.bbs.setAfeVis(obj.afeVis);
 
+                    pause;
+                    soundsc(sig,fsHz);
+                        
                     % Run the blackboard system
                     obj.bbs.run();
 
                     obj.robot.shutdown();
 
                     if obj.bStopNow
-                        return;
+                        continue;
                     end
                 end
                 % End of the simulation
@@ -201,7 +208,7 @@ classdef DemoController < handle
                 obj.robot.rotateHead(0, 'absolute');
                 
                 % Create blackboard
-                obj.bbs = buildBBS(obj.robot, ...
+                [obj.bbs, obj.locDecKS] = buildBBS(obj.robot, ...
                     obj.bFrontLocationOnly, ...
                     obj.bSolveConfusion, ...
                     obj.bFullBodyRotation, ...
@@ -233,6 +240,14 @@ classdef DemoController < handle
             obj.locVis.reset;
             obj.afeVis.reset;
         end
+        
+        function setSolveConfusion(obj, bSolveConfusion)
+            obj.bSolveConfusion = bSolveConfusion;
+            if ~isempty(obj.locDecKS)
+                obj.locDecKS.setSolveConfusion(bSolveConfusion);
+            end
+        end
+        
     end
 end
 

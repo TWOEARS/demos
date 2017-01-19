@@ -1,15 +1,18 @@
-function [bbs, locDecisionKS, segKS] = buildBlackboardSystem(robot, bFrontLocationOnly, bSolveConfusion, bIdentifySources, idSegModels, fsHz)
+function [bbs, locDecisionKS, segKS] = buildBlackboardSystem(robot, bFrontLocationOnly, bSolveConfusion, bIdentifySources, idSegModels, topdown_preset)
 
-if ~exist('fsHz', 'var')
-    fsHz = 16000;
+if ~exist('topdown_preset', 'var')
+    topdown_preset = 'JIDO-REC';
 end
+
+
+fsHz = 16000;
 
 %%
 bbs = BlackboardSystem(1);
 bbs.setRobotConnect(robot);
 
 bbs.setDataConnect('AuditoryFrontEndKS', fsHz, 0.5);
-segKS = bbs.createKS('TopdownSourceModelKS', {'JIDO-REC'});
+segKS = bbs.createKS('TopdownSourceModelKS', {topdown_preset});
 if bFrontLocationOnly
     locKS = bbs.createKS('DnnLocationKS', {'MCT-DIFFUSE-FRONT'});
 else
@@ -20,8 +23,8 @@ rotateKS = bbs.createKS('HeadRotationKS', {robot});
 
 %%
 ppRemoveDc = false;
-segIdClassThresholds.fire = 0.6;
-segIdLeakFactor = 0.25;
+%segIdClassThresholds.fire = 0.6;
+segIdLeakFactor = 0.5;
 segIdGaussWidth = 8;
 segIdMaxObjects = 1;
 
