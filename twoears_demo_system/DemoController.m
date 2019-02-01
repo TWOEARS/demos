@@ -69,22 +69,22 @@ classdef DemoController < handle
                 segidModelsDir = fullfile( pwd, 'models', 'segId' );
                 segModelsDirContents = dir( [segidModelsDir filesep '*.model.mat'] );
                 segidModels = arrayfun( @(x)(struct('name', {x.name(1:end-10)})), segModelsDirContents );
-%                 donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'crash','engine','dog','footsteps'} ) ) ), segidModels );
-%                 segidModels(donotusemodels) = [];
+                donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'piano','phone','crash','engine','dog','footsteps'} ) ) ), segidModels );
+                segidModels(donotusemodels) = [];
                 [segidModels(1:numel(segidModels)).dir] = deal( segidModelsDir );
             end
             if any( strcmp( obj.runningMode, {'frequencyMasked loc', 'both'} ) )
                 idModelsDir = fullfile( pwd, 'models', 'fs' );
                 modelsDirContents = dir( [idModelsDir filesep '*.model.mat'] );
                 idModels = arrayfun( @(x)(struct('name', {x.name(1:end-10)})), modelsDirContents );
-%                 donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'crash','engine','dog','footsteps'} ) ) ), idModels );
-%                 idModels(donotusemodels) = [];
+                donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'piano','phone','crash','engine','dog','footsteps'} ) ) ), idModels );
+                idModels(donotusemodels) = [];
                 [idModels(1:numel(idModels)).dir] = deal( idModelsDir );
             end
             idFs = 16000;
             ppRemoveDc = false;
             
-            [sourceSets, sourceVolumes] = setupScenes;
+            [sourceSets, sourceVolumes] = setupScenes();
             
             for ii = 1:length(sourceSets)
                 
@@ -123,6 +123,7 @@ classdef DemoController < handle
                 obj.bbs.setLocVis(obj.locVis);
                 obj.bbs.setAfeVis(obj.afeVis);
                 
+                disp( 'Press key to continue.' );
                 pause;
                 soundsc(sig,fsHz);
                 
