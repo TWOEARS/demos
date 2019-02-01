@@ -1,4 +1,4 @@
-function [bbs,locDec]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, bFullBodyRotation, ...
+function [bbs,locDec]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ...
                         idModels, idSegModels, ppRemoveDc, fs, runningMode)
 
 % runningMode:
@@ -16,11 +16,7 @@ else
     dnnloc = bbs.createKS('DnnLocationKS', {'MCT-DIFFUSE'});
 end
 locDec = bbs.createKS( 'LocalisationDecisionKS', {bSolveConfusion,0.5} );
-if bFullBodyRotation
-    rot = bbs.createKS('FullBodyRotationKS', {sim});
-else
-    rot = bbs.createKS('HeadRotationKS', {sim});
-end
+rot = bbs.createKS('HeadRotationKS', {sim});
 %%
 idClassThresholds.fire = 0.8;
 segIdClassThresholds.fire = 0.8;

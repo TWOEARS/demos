@@ -1,0 +1,3 @@
+Sound event detection models for this demo can be downloaded from
+
+https://github.com/nigroup/Supplementaries-to-TASLP-Joining-Sound-Event-Detection-and-Localization-Through-Spatial-Segregation.git
