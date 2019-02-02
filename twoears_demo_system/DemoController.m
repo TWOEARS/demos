@@ -15,7 +15,6 @@ classdef DemoController < handle
         locVis; % visualiser for Localisation
         
         % Define simulator variables
-        brirs;
         refSourceAzimuths; % Reference source azimuths
         bStopNow = false;
         
@@ -26,10 +25,12 @@ classdef DemoController < handle
         
         % Energy threshold (average ratemap) for valid frames in
         % localisation
-        energyThresholdJido = 1E-9;
         energyThresholdSimulation = 1E-11;
         
-        runningMode = 'segregated identification';    % 'frequencyMasked loc', 'segregated identification', or 'both'
+        runningMode = 'segregated identification';    % 'frequencyMasked loc',
+                                                      % 'segregated
+                                                      % identification',
+                                                      % or 'both'
     end
     
     methods
@@ -52,12 +53,6 @@ classdef DemoController < handle
             obj.bStopNow = false;
             obj.bSolveConfusion = false;
             obj.bFrontLocationOnly = false;
-            obj.brirs = { ...
-                'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos1.sofa'; ...
-                'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos2.sofa'; ...
-                'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos3.sofa'; ...
-                'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos4.sofa'; ...
-                };
         end
         
         % Run the blackboard
@@ -81,8 +76,6 @@ classdef DemoController < handle
                 idModels(donotusemodels) = [];
                 [idModels(1:numel(idModels)).dir] = deal( idModelsDir );
             end
-            idFs = 16000;
-            ppRemoveDc = false;
             
             [sourceSets, sourceVolumes] = setupScenes();
             
@@ -92,7 +85,8 @@ classdef DemoController < handle
                 obj.reset();
                 
                 sourceList = sourceSets{ii};
-                [obj.robot, refAzimuths, robotOrientation] = setupBinauralSimulator(sourceList, sourceVolumes{ii});
+                [obj.robot, refAzimuths, robotOrientation] = ...
+                    setupBinauralSimulator(sourceList, sourceVolumes{ii});
                 nSources = length(refAzimuths);
                 % Plot ground true source positions
                 for jj = 1:nSources
@@ -106,15 +100,12 @@ classdef DemoController < handle
                 obj.robot.Init = true;
                 obj.robot.start();
                 
-                sig = obj.robot.getSignal(10);
-                fsHz = 44100;
-                
                 % Create blackboard
                 [obj.bbs, obj.locDecKS] = buildBBS(obj.robot, ...
                     obj.bFrontLocationOnly, ...
                     obj.bSolveConfusion, ...
                     idModels, segidModels, ...
-                    ppRemoveDc, idFs, obj.runningMode);
+                    16000, obj.runningMode);
                 % Set energy threshold for detecting valid frames
                 obj.bbs.setEnergyThreshold(obj.energyThresholdSimulation);
                 
@@ -125,16 +116,11 @@ classdef DemoController < handle
                 
                 disp( 'Press key to continue.' );
                 pause;
-                soundsc(sig,fsHz);
                 
                 % Run the blackboard system
                 obj.bbs.run();
                 
                 obj.robot.shutdown();
-                
-                if obj.bStopNow
-                    continue;
-                end
             end
             % End of the simulation
         end

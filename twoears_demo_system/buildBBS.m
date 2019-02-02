@@ -1,10 +1,12 @@
 function [bbs,locDec]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ...
-                        idModels, idSegModels, ppRemoveDc, fs, runningMode)
+                        idModels, idSegModels, fs, runningMode)
 
 % runningMode:
 % 'frequencyMasked loc'
 % 'segregated identification'
 % 'both'
+ppRemoveDc = false;
+
 bbs = BlackboardSystem(1);
 bbs.setRobotConnect(sim);
 %% localization KSs
