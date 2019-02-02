@@ -28,8 +28,7 @@ classdef DemoController < handle
         energyThresholdSimulation = 1E-11;
         
         runningMode = 'segregated identification';    % 'frequencyMasked loc',
-                                                      % 'segregated
-                                                      % identification',
+                                                      % 'segregated identification',
                                                       % or 'both'
     end
     
@@ -44,17 +43,8 @@ classdef DemoController < handle
             obj.locVis = VisualiserIdentityLocalisation(handles.axesRoom);
             
             obj.reset();
-            obj.setupRobot();
         end
-        
-        % Setup Robot
-        function success = setupRobot(obj)
-            success = true;
-            obj.bStopNow = false;
-            obj.bSolveConfusion = false;
-            obj.bFrontLocationOnly = false;
-        end
-        
+                
         % Run the blackboard
         function startBlackboard(obj)
             % initializations for identification models
@@ -114,8 +104,8 @@ classdef DemoController < handle
                 obj.bbs.setLocVis(obj.locVis);
                 obj.bbs.setAfeVis(obj.afeVis);
                 
-                disp( 'Press key to continue.' );
-                pause;
+%                 disp( 'Press key to continue.' );
+%                 pause;
                 
                 % Run the blackboard system
                 obj.bbs.run();
@@ -131,7 +121,7 @@ classdef DemoController < handle
                 obj.robot.stop();
             end
             obj.reset();
-            obj.setupRobot();
+            obj.bStopNow = false;
         end
 
         function reset(obj)

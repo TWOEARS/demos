@@ -19,8 +19,8 @@ end
 locDec = bbs.createKS( 'LocalisationDecisionKS', {bSolveConfusion,0.5} );
 rot = bbs.createKS('HeadRotationKS', {sim});
 %%
-idClassThresholds.fire = 0.8;
-segIdClassThresholds.fire = 0.8;
+idClassThresholds.fire = 0.5;
+segIdClassThresholds.fire = 0.5;
 segIdLeakFactor = 0.25;
 segIdGaussWidth = 10;
 segIdMaxObjects = 2;

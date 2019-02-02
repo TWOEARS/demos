@@ -164,7 +164,7 @@ switch val
     case 1 % top-down localization
        handles.ctrl.runningMode = 'frequencyMasked loc';
     case 2 % segregated identification
-       handles.ctrl.runningMode = 'spatiallyMasked id';
+       handles.ctrl.runningMode = 'segregated identification';
     case 3 % both
        handles.ctrl.runningMode = 'both';
 end
