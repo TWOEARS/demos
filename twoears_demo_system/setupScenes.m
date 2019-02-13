@@ -1,8 +1,8 @@
 function [sourceSets, sourceVolumes] = setupScenes
 
-sourceSets{1} = {'femaleSpeech'};
+sourceSets{1} = {'signal1'};
 sourceVolumes{1} = [1];
-sourceSets{2} = {'alarm'};
-sourceVolumes{2} = [1];
-sourceSets{3} = {'femaleSpeech', 'alarm'};
-sourceVolumes{3} = [1 1];
+sourceSets{2} = {'signal1';'signal4'};
+sourceVolumes{2} = [1 1];
+sourceSets{3} = {'signal1';'signal2';'signal4';'signal3'};
+sourceVolumes{3} = [1 1 1 1];

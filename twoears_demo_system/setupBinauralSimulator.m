@@ -1,15 +1,34 @@
-function [sim,refAzimuths,robotOrientation] = setupBinauralSimulator(sourceList, sourceVolumes)
+function [sim,refAzimuths,robotOrientation,labels,onOffsets,activity] = setupBinauralSimulator(sourceList, sourceVolumes)
 %
 %
-% sourceList = {'alarm', 'fire', 'male', 'female'}
+% sourceList := 'signal<k>', k=1..4
 %
 
 % Number of sources
-nSources = length(sourceList);
+nSources = size(sourceList,1);
 if nargin < 2
     sourceVolumes = ones(nSources,1);
 end
 
+fprintf( 'Loading signals.' );
+sourceData = cell( nSources, 1 );
+labels = cell( nSources, 1 );
+onOffsets = cell( nSources, 1 );
+activity = cell( nSources, 1 );
+for nn = 1 : size( sourceList, 1 )
+    sigLen = 0;
+    for ss = 1 : size( sourceList, 2 )
+        sm = load( sourceList{nn,ss} );
+        sourceData{nn} = cat( 1, sourceData{nn}, sm.sourceSignal );
+        labels{nn} = cat( 1, labels{nn}, sm.labels );
+        onOffsets{nn} = cat( 1, onOffsets{nn}, sm.onOffsets + sigLen );
+        activity{nn} = cat( 1, activity{nn}, sm.activity );
+        sigLen = numel( sourceData{nn} ) / 44100;
+        fprintf( '.' );
+    end
+end
+clear sm;
+fprintf( '\n' );
 brirs = {...
     'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos1.sofa'; ...
     'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos2.sofa'; ...
@@ -17,7 +36,7 @@ brirs = {...
     'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos4.sofa'; ...
 };
 brirIndex = 2;
-sourcePosIndices = [4 3 2 1];
+sourcePosIndices = [4 2 1 3];
                     
 % Get metadata from BRIR
 brir = SOFAload(db.getFile(brirs{brirIndex}), 'nodata');
@@ -36,7 +55,6 @@ fsHz = 44100;
 set(sim, ...
 	'BlockSize',            4096, ...
     'SampleRate',           fsHz, ...
-    'LengthOfSimulation',   60, ...
     'Renderer',             @ssr_brs ...
     );
 
@@ -78,14 +96,13 @@ set(sim.Sinks, 'Name', 'Head');
 for n = 1:nSources
     set(sim.Sources{n}, ...
         'AudioBuffer', simulator.buffer.Ring(1), ...
-        'Name', sourceList{n}, ...
+        'Name', strcat( sourceList{n,:} ), ...
         'Volume', sourceVolumes(n));
-    sim.Sources{n}.AudioBuffer.loadFile(...
-        sprintf('../audio/%s.wav', sourceList{n}), ...
-        sim.SampleRate);
+    sim.Sources{n}.setData(cat( 1, sourceData{n,:} ));
 end
+clear sourceData;
 
-% Set source positions
+% get source azimuths
 refAzimuths = zeros(nSources, 1);
 for jj = 1:nSources
     srcPos = sourcePosIndices(jj);

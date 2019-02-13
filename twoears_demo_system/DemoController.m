@@ -75,13 +75,8 @@ classdef DemoController < handle
                 obj.reset();
                 
                 sourceList = sourceSets{ii};
-                [obj.robot, refAzimuths, robotOrientation] = ...
+                [obj.robot, refAzimuths, robotOrientation,labels,onOffsets,activity] = ...
                     setupBinauralSimulator(sourceList, sourceVolumes{ii});
-                nSources = length(refAzimuths);
-                % Plot ground true source positions
-                for jj = 1:nSources
-                    obj.locVis.plotMarkerAtAngle(jj, refAzimuths(jj), sourceList{jj});
-                end
                 
                 fprintf('Robot position %d: %.0f degrees (world)\n', ii, robotOrientation);
                 
@@ -95,7 +90,8 @@ classdef DemoController < handle
                     obj.bFrontLocationOnly, ...
                     obj.bSolveConfusion, ...
                     idModels, segidModels, ...
-                    16000, obj.runningMode);
+                    16000, obj.runningMode, ...
+                    labels,onOffsets,activity,refAzimuths);
                 % Set energy threshold for detecting valid frames
                 obj.bbs.setEnergyThreshold(obj.energyThresholdSimulation);
                 

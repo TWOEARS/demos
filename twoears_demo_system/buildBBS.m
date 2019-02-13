@@ -1,5 +1,6 @@
 function [bbs,locDec]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ...
-                        idModels, idSegModels, fs, runningMode)
+                                  idModels, idSegModels, fs, runningMode, ...
+                                  labels, onOffsets, activity, azms )
 
 % runningMode:
 % 'frequencyMasked loc'
@@ -55,8 +56,11 @@ if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
     end  
     collectId = bbs.createKS('IntegrateFullstreamIdentitiesKS', {idLeakFactor,inf,idClassThresholds});
 end
+%% ground truth intrusion
+idCheat = bbs.createKS('GroundTruthPlotKS', {labels, onOffsets, activity, azms});
 %% knowledge source binding
 bbs.blackboardMonitor.bind({bbs.scheduler}, {bbs.dataConnect}, 'replaceOld', 'AgendaEmpty' );
+bbs.blackboardMonitor.bind({bbs.dataConnect}, {idCheat}, 'replaceOld' );
 bbs.blackboardMonitor.bind({bbs.dataConnect}, {dnnloc}, 'replaceOld' );
 bbs.blackboardMonitor.bind({dnnloc}, {locDec}, 'add' );
 bbs.blackboardMonitor.bind({locDec}, {rot}, 'replaceOld', 'RotateHead' );
