@@ -22,7 +22,7 @@ function varargout = twoears_demo_system(varargin)
 
 % Edit the above text to modify the response to help twoears_demo_system
 
-% Last Modified by GUIDE v2.5 14-Feb-2019 12:40:56
+% Last Modified by GUIDE v2.5 14-Feb-2019 14:47:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -204,4 +204,18 @@ function checkboxUseAdream_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkboxUseAdream
 
 handles.ctrl.bUseAdream = get( hObject, 'Value' );
+
+
+% --- Executes on button press in checkboxFsInitSegId.
+function checkboxFsInitSegId_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxFsInitSegId (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxFsInitSegId
+
+handles.ctrl.bFsInitSI = get( hObject, 'Value' );
+
+
+
 

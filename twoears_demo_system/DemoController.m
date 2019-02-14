@@ -24,12 +24,13 @@ classdef DemoController < handle
         bSimulation = true; % If true, use simulation instead of robot
         nsrcsGroundtruth = true;
         bUseAdream = false;
+        bFsInitSI = false;
         
         % Energy threshold (average ratemap) for valid frames in
         % localisation
         energyThresholdSimulation = 1E-11;
         
-        runningMode = 'segregated identification';    % 'frequencyMasked loc',
+        runningMode = 'both';                         % 'frequencyMasked loc',
                                                       % 'segregated identification',
                                                       % or 'both'
     end
@@ -60,7 +61,8 @@ classdef DemoController < handle
 %                 segidModels(donotusemodels) = [];
                 [segidModels(1:numel(segidModels)).dir] = deal( segidModelsDir );
             end
-            if any( strcmp( obj.runningMode, {'frequencyMasked loc', 'both'} ) )
+            if any( strcmp( obj.runningMode, {'frequencyMasked loc', 'both'} ) ) ...
+                    || obj.bFsInitSI
                 idModelsDir = fullfile( pwd, 'models', 'fs' );
                 modelsDirContents = dir( [idModelsDir filesep '*.model.mat'] );
                 idModels = arrayfun( @(x)(struct('name', {x.name(1:end-10)})), modelsDirContents );
@@ -92,6 +94,7 @@ classdef DemoController < handle
                     obj.bFrontLocationOnly, ...
                     obj.bSolveConfusion, ...
                     obj.nsrcsGroundtruth, ...
+                    obj.bFsInitSI, ...
                     idModels, segidModels, ...
                     16000, obj.runningMode, ...
                     labels,onOffsets,activity,refAzimuths);

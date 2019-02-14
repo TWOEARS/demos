@@ -1,5 +1,5 @@
 function [bbs,locDecKs]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ...
-                                  bNsrcsGroundtruth, ...
+                                  bNsrcsGroundtruth, bFsInitSI, ...
                                   idModels, idSegModels, fs, runningMode, ...
                                   labels, onOffsets, activity, azms )
 
@@ -27,10 +27,14 @@ fprintf( '.' );
 %%
 idClassThresholds.fire = 0.5;
 segIdClassThresholds.fire = 0.5;
-segIdLeakFactor = 0.25;
+if bFsInitSI
+    segIdLeakFactor = 1.0;
+else
+    segIdLeakFactor = 0.75;
+end
 segIdGaussWidth = 10;
 segIdMaxObjects = inf;
-idLeakFactor = 0.5;
+idLeakFactor = 1.0;
 %% nsrcs KS
 if ~bNsrcsGroundtruth
     nsrcsKs = bbs.createKS( 'NumberOfSourcesKS', {'nSrcs','learned_models/NumberOfSourcesKS/mc3_models_dataset_1',ppRemoveDc} );
@@ -57,8 +61,11 @@ if any( strcmp( runningMode, {'segregated identification', 'both'} ) )
     end
     collectSegId = bbs.createKS('IntegrateSegregatedIdentitiesKS', {segIdLeakFactor,segIdGaussWidth,segIdMaxObjects,segIdClassThresholds});
 end
-if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
+if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) ) || bFsInitSI
     for ii = 1 : numel( idModels )
+        if bFsInitSI && ~strcmp( idModels(ii).name, idSegModels(ii).name )
+            error( 'To enable Fullstream models initiating Segregated Identification, include FS and SegId models for the same event types in the same order.' );
+        end
         idKss{ii} = bbs.createKS('IdentityKS', {idModels(ii).name, idModels(ii).dir, ppRemoveDc});
         idKss{ii}.setInvocationFrequency(10);
     end  
@@ -75,17 +82,27 @@ bbs.blackboardMonitor.bind({locDecKs}, {rot}, 'replaceOld', 'RotateHead' );
 if ~bNsrcsGroundtruth
     bbs.blackboardMonitor.bind({locDecKs}, {nsrcsKs}, 'replaceOld' );
 end
+if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
+    if bFsInitSI
+        bbs.blackboardMonitor.bind({spatSegrKs}, idKss, 'replaceOld' );
+    else
+        bbs.blackboardMonitor.bind({bbs.dataConnect}, idKss, 'replaceOld' );
+    end
+    bbs.blackboardMonitor.bind(idKss, {collectId}, 'replaceParallelOld' );    
+end
 if any( strcmp( runningMode, {'segregated identification', 'both'} ) )
     if ~bNsrcsGroundtruth
         bbs.blackboardMonitor.bind({nsrcsKs}, {spatSegrKs}, 'replaceOld' );
     else
         bbs.blackboardMonitor.bind({groundtruthKs}, {spatSegrKs}, 'replaceOld', 'NSrcsTruth' );
     end
-    bbs.blackboardMonitor.bind({spatSegrKs}, idSegKss, 'replaceOld' );
-    bbs.blackboardMonitor.bind({idSegKss{end}}, {collectSegId}, 'replaceOld' );
-end
-if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
-    bbs.blackboardMonitor.bind({bbs.dataConnect}, idKss, 'replaceOld' );
-    bbs.blackboardMonitor.bind({idKss{end}}, {collectId}, 'replaceOld' );    
+    if bFsInitSI
+        for ii = 1 : numel( idKss )
+            bbs.blackboardMonitor.bind({idKss{ii}}, {idSegKss{ii}}, 'replaceOld', 'SoundEventDetected' );
+        end
+    else
+        bbs.blackboardMonitor.bind({spatSegrKs}, idSegKss, 'replaceOld' );
+    end
+    bbs.blackboardMonitor.bind(idSegKss, {collectSegId}, 'replaceParallelOld' );
 end
 fprintf( ';\n' );
