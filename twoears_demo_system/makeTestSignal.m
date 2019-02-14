@@ -51,5 +51,5 @@ fprintf( '.' );
 energy = interp1( tFramesSec, energy, (1:numel(sourceSignal))./44100 )';
 fprintf( ':' );
 
-save( testSignalFile, 'sourceSignal', 'onOffsets', 'labels', 'activity', 'energy' );
+save( testSignalFile, 'sourceSignal', 'onOffsets', 'labels', 'activity' );%, 'energy' );
 fprintf( ';\n' );
