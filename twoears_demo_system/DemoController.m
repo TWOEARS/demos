@@ -23,6 +23,7 @@ classdef DemoController < handle
         bFrontLocationOnly = false; % flag for localiation in the frontal plane only        
         bSimulation = true; % If true, use simulation instead of robot
         nsrcsGroundtruth = true;
+        bUseAdream = false;
         
         % Energy threshold (average ratemap) for valid frames in
         % localisation
@@ -77,7 +78,7 @@ classdef DemoController < handle
                 
                 sourceList = sourceSets{ii};
                 [obj.robot, refAzimuths, robotOrientation,labels,onOffsets,activity] = ...
-                    setupBinauralSimulator(sourceList, sourceVolumes{ii});
+                    setupBinauralSimulator(sourceList, sourceVolumes{ii}, obj.bUseAdream);
                 
                 fprintf('Robot position %d: %.0f degrees (world)\n', ii, robotOrientation);
                 

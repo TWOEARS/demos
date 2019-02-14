@@ -22,7 +22,7 @@ function varargout = twoears_demo_system(varargin)
 
 % Edit the above text to modify the response to help twoears_demo_system
 
-% Last Modified by GUIDE v2.5 14-Feb-2019 11:04:30
+% Last Modified by GUIDE v2.5 14-Feb-2019 12:40:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -193,3 +193,15 @@ function checkboxNsrcsGroundtruth_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkboxNsrcsGroundtruth
 
 handles.ctrl.nsrcsGroundtruth = get( hObject, 'Value' );
+
+
+% --- Executes on button press in checkboxUseAdream.
+function checkboxUseAdream_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxUseAdream (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxUseAdream
+
+handles.ctrl.bUseAdream = get( hObject, 'Value' );
+

@@ -3,6 +3,7 @@ function [bbs,locDecKs]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ..
                                   idModels, idSegModels, fs, runningMode, ...
                                   labels, onOffsets, activity, azms )
 
+fprintf( 'Building blackboard system' );
 % runningMode:
 % 'frequencyMasked loc'
 % 'segregated identification'
@@ -28,7 +29,7 @@ idClassThresholds.fire = 0.5;
 segIdClassThresholds.fire = 0.5;
 segIdLeakFactor = 0.25;
 segIdGaussWidth = 10;
-segIdMaxObjects = 2;
+segIdMaxObjects = inf;
 idLeakFactor = 0.5;
 %% nsrcs KS
 if ~bNsrcsGroundtruth
@@ -87,3 +88,4 @@ if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
     bbs.blackboardMonitor.bind({bbs.dataConnect}, idKss, 'replaceOld' );
     bbs.blackboardMonitor.bind({idKss{end}}, {collectId}, 'replaceOld' );    
 end
+fprintf( ';\n' );

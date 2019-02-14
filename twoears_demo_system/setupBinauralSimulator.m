@@ -1,4 +1,4 @@
-function [sim,refAzimuths,robotOrientation,labels,onOffsets,activity] = setupBinauralSimulator(sourceList, sourceVolumes)
+function [sim,refAzimuths,robotOrientation,labels,onOffsets,activity] = setupBinauralSimulator(sourceList, sourceVolumes, bUseAdream)
 %
 %
 % sourceList := 'signal<k>', k=1..4
@@ -29,22 +29,29 @@ for nn = 1 : size( sourceList, 1 )
 end
 clear sm;
 fprintf( '\n' );
-brirs = {...
-    'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos1.sofa'; ...
-    'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos2.sofa'; ...
-    'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos3.sofa'; ...
-    'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos4.sofa'; ...
-};
-brirIndex = 2;
-sourcePosIndices = [4 2 1 3];
-                    
-% Get metadata from BRIR
-brir = SOFAload(db.getFile(brirs{brirIndex}), 'nodata');
 
-% Get 0 degree look head orientation from BRIR
-nsteps = size(brir.ListenerView, 1);
-robotPos = SOFAconvertCoordinates(brir.ListenerView(ceil(nsteps/2),:),'cartesian','spherical');
-robotOrientation = robotPos(1); % World frame
+if bUseAdream
+    brirs = {...
+        'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos1.sofa'; ...
+        'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos2.sofa'; ...
+        'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos3.sofa'; ...
+        'impulse_responses/twoears_kemar_adream/TWOEARS_KEMAR_ADREAM_pos4.sofa'; ...
+        };
+    brirIndex = 2;
+    sourcePosIndices = [4 2 1 3];
+    
+    % Get metadata from BRIR
+    brir = SOFAload(db.getFile(brirs{brirIndex}), 'nodata');
+    
+    % Get 0 degree look head orientation from BRIR
+    nsteps = size(brir.ListenerView, 1);
+    robotPos = SOFAconvertCoordinates(brir.ListenerView(ceil(nsteps/2),:),'cartesian','spherical');
+    robotOrientation = robotPos(1); % World frame
+else
+    hrir = 'impulse_responses/qu_kemar_anechoic/QU_KEMAR_anechoic_3m.sofa';
+    sourceAzms = [0 -110 +45 -35];
+    robotOrientation = 0;
+end
 
 
 % Initialise binaural simulator
@@ -52,11 +59,18 @@ sim = simulator.SimulatorConvexRoom();
 
 % Basis parameters - Block size, sample rate and the renderer type
 fsHz = 44100;
-set(sim, ...
-	'BlockSize',            4096, ...
-    'SampleRate',           fsHz, ...
-    'Renderer',             @ssr_brs ...
-    );
+if bUseAdream
+    set(sim, ...
+        'BlockSize',            4096, ...
+        'SampleRate',           fsHz, ...
+        'Renderer',             @ssr_brs ...
+        );
+else
+    set( sim, 'Renderer', @ssr_binaural );
+    set( sim, 'HRIRDataset', simulator.DirectionalIR( db.getFile( hrir ) ) );
+    set( sim, 'SampleRate', fsHz );
+    set( sim, 'BlockSize', 4096 );
+end
 
 % Set the acoustic scene - nSources and a binaural sensor
 switch nSources
@@ -95,7 +109,7 @@ set(sim.Sinks, 'Name', 'Head');
 
 for n = 1:nSources
     set(sim.Sources{n}, ...
-        'AudioBuffer', simulator.buffer.Ring(1), ...
+        'AudioBuffer', simulator.buffer.FIFO(1), ...
         'Name', strcat( sourceList{n,:} ), ...
         'Volume', sourceVolumes(n));
     sim.Sources{n}.setData(cat( 1, sourceData{n,:} ));
@@ -105,11 +119,17 @@ clear sourceData;
 % get source azimuths
 refAzimuths = zeros(nSources, 1);
 for jj = 1:nSources
-    srcPos = sourcePosIndices(jj);
-    sim.Sources{jj}.IRDataset = simulator.DirectionalIR(brirs{brirIndex}, srcPos);
-
-    % Get source direction from BRIR
-    y = brir.EmitterPosition(srcPos, 2) - brir.ListenerPosition(2);
-    x = brir.EmitterPosition(srcPos, 1) - brir.ListenerPosition(1);
-    refAzimuths(jj) = atan2d(y, x) - robotOrientation; % Reference azimuth
+    if bUseAdream
+        srcPos = sourcePosIndices(jj);
+        sim.Sources{jj}.IRDataset = simulator.DirectionalIR(brirs{brirIndex}, srcPos);
+        
+        % Get source direction from BRIR
+        y = brir.EmitterPosition(srcPos, 2) - brir.ListenerPosition(2);
+        x = brir.EmitterPosition(srcPos, 1) - brir.ListenerPosition(1);
+        refAzimuths(jj) = atan2d(y, x) - robotOrientation; % Reference azimuth
+    else
+        sim.Sources{jj}.Radius = 3;
+        sim.Sources{jj}.Azimuth = sourceAzms(jj);
+        refAzimuths(jj) = sourceAzms(jj);
+    end
 end
