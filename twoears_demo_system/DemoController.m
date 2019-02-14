@@ -106,13 +106,13 @@ classdef DemoController < handle
                 obj.bbs.setLocVis(obj.locVis);
                 obj.bbs.setAfeVis(obj.afeVis);
                 
-%                 disp( 'Press key to continue.' );
-%                 pause;
-                
                 % Run the blackboard system
                 obj.bbs.run();
                 
                 obj.robot.shutdown();
+                
+                modelData = readoutBB( obj.bbs );
+                save( ['results_' num2str( ii )], 'modelData', 'labels', 'onOffsets', 'activity', 'refAzimuths' );
             end
             % End of the simulation
         end

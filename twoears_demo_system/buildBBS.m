@@ -75,14 +75,20 @@ end
 groundtruthKs = bbs.createKS('GroundTruthKS', {labels, onOffsets, activity, azms, bNsrcsGroundtruth});
 %% knowledge source binding
 bbs.blackboardMonitor.bind({bbs.scheduler}, {bbs.dataConnect}, 'replaceOld', 'AgendaEmpty' );
-bbs.blackboardMonitor.bind({bbs.dataConnect}, {groundtruthKs}, 'replaceOld' );
 bbs.blackboardMonitor.bind({bbs.dataConnect}, {dnnlocKs}, 'replaceOld' );
 bbs.blackboardMonitor.bind({dnnlocKs}, {locDecKs}, 'add' );
 bbs.blackboardMonitor.bind({locDecKs}, {rot}, 'replaceOld', 'RotateHead' );
+
+bbs.blackboardMonitor.bind({locDecKs}, {groundtruthKs}, 'replaceOld' );
 if ~bNsrcsGroundtruth
     bbs.blackboardMonitor.bind({locDecKs}, {nsrcsKs}, 'replaceOld' );
 end
+
 if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
+%     % TODO: integrate frequencyMasked location models
+%     for ii = 1 : numel( idKss )
+%         bbs.blackboardMonitor.bind({idKss{ii}}, {typeMaskedLoc{ii}}, 'replaceOld', 'SoundEventDetected' );
+%     end
     if bFsInitSI
         bbs.blackboardMonitor.bind({spatSegrKs}, idKss, 'replaceOld' );
     else
@@ -90,6 +96,7 @@ if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
     end
     bbs.blackboardMonitor.bind(idKss, {collectId}, 'replaceParallelOld' );    
 end
+
 if any( strcmp( runningMode, {'segregated identification', 'both'} ) )
     if ~bNsrcsGroundtruth
         bbs.blackboardMonitor.bind({nsrcsKs}, {spatSegrKs}, 'replaceOld' );
@@ -105,4 +112,5 @@ if any( strcmp( runningMode, {'segregated identification', 'both'} ) )
     end
     bbs.blackboardMonitor.bind(idSegKss, {collectSegId}, 'replaceParallelOld' );
 end
+
 fprintf( ';\n' );
