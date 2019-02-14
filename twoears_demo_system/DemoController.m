@@ -19,9 +19,10 @@ classdef DemoController < handle
         bStopNow = false;
         
         % Define localisation demo parameters
-        bSolveConfusion = false; % flag for rotating head/body during localisation to solve confusion
+        bSolveConfusion = true; % flag for rotating head/body during localisation to solve confusion
         bFrontLocationOnly = false; % flag for localiation in the frontal plane only        
         bSimulation = true; % If true, use simulation instead of robot
+        nsrcsGroundtruth = true;
         
         % Energy threshold (average ratemap) for valid frames in
         % localisation
@@ -54,16 +55,16 @@ classdef DemoController < handle
                 segidModelsDir = fullfile( pwd, 'models', 'segId' );
                 segModelsDirContents = dir( [segidModelsDir filesep '*.model.mat'] );
                 segidModels = arrayfun( @(x)(struct('name', {x.name(1:end-10)})), segModelsDirContents );
-                donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'piano','phone','crash','engine','dog','footsteps'} ) ) ), segidModels );
-                segidModels(donotusemodels) = [];
+%                 donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'piano','phone','crash','engine','dog','footsteps'} ) ) ), segidModels );
+%                 segidModels(donotusemodels) = [];
                 [segidModels(1:numel(segidModels)).dir] = deal( segidModelsDir );
             end
             if any( strcmp( obj.runningMode, {'frequencyMasked loc', 'both'} ) )
                 idModelsDir = fullfile( pwd, 'models', 'fs' );
                 modelsDirContents = dir( [idModelsDir filesep '*.model.mat'] );
                 idModels = arrayfun( @(x)(struct('name', {x.name(1:end-10)})), modelsDirContents );
-                donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'piano','phone','crash','engine','dog','footsteps'} ) ) ), idModels );
-                idModels(donotusemodels) = [];
+%                 donotusemodels = arrayfun( @(x)( any( strcmpi( x.name, {'piano','phone','crash','engine','dog','footsteps'} ) ) ), idModels );
+%                 idModels(donotusemodels) = [];
                 [idModels(1:numel(idModels)).dir] = deal( idModelsDir );
             end
             
@@ -89,6 +90,7 @@ classdef DemoController < handle
                 [obj.bbs, obj.locDecKS] = buildBBS(obj.robot, ...
                     obj.bFrontLocationOnly, ...
                     obj.bSolveConfusion, ...
+                    obj.nsrcsGroundtruth, ...
                     idModels, segidModels, ...
                     16000, obj.runningMode, ...
                     labels,onOffsets,activity,refAzimuths);

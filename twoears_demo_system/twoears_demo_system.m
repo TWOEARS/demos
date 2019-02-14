@@ -22,7 +22,7 @@ function varargout = twoears_demo_system(varargin)
 
 % Edit the above text to modify the response to help twoears_demo_system
 
-% Last Modified by GUIDE v2.5 01-Feb-2019 13:35:48
+% Last Modified by GUIDE v2.5 14-Feb-2019 11:04:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -182,3 +182,14 @@ function popupmenuRunningMode_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in checkboxNsrcsGroundtruth.
+function checkboxNsrcsGroundtruth_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxNsrcsGroundtruth (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxNsrcsGroundtruth
+
+handles.ctrl.nsrcsGroundtruth = get( hObject, 'Value' );

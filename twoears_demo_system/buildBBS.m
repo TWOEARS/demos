@@ -1,4 +1,5 @@
-function [bbs,locDec]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ...
+function [bbs,locDecKs]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ...
+                                  bNsrcsGroundtruth, ...
                                   idModels, idSegModels, fs, runningMode, ...
                                   labels, onOffsets, activity, azms )
 
@@ -13,12 +14,15 @@ bbs.setRobotConnect(sim);
 %% localization KSs
 bbs.setDataConnect('AuditoryFrontEndKS', fs, 0.5);
 if bFrontLocationOnly
-    dnnloc = bbs.createKS('DnnLocationKS', {'MCT-DIFFUSE-FRONT'});
+    dnnlocKs = bbs.createKS('DnnLocationKS', {'MCT-DIFFUSE-FRONT'});
 else
-    dnnloc = bbs.createKS('DnnLocationKS', {'MCT-DIFFUSE'});
+    dnnlocKs = bbs.createKS('DnnLocationKS', {'MCT-DIFFUSE'});
 end
-locDec = bbs.createKS( 'LocalisationDecisionKS', {bSolveConfusion,0.5} );
+fprintf( '.' );
+locDecKs = bbs.createKS( 'LocalisationDecisionKS', {bSolveConfusion,0.5} );
+fprintf( '.' );
 rot = bbs.createKS('HeadRotationKS', {sim});
+fprintf( '.' );
 %%
 idClassThresholds.fire = 0.5;
 segIdClassThresholds.fire = 0.5;
@@ -26,9 +30,12 @@ segIdLeakFactor = 0.25;
 segIdGaussWidth = 10;
 segIdMaxObjects = 2;
 idLeakFactor = 0.5;
-%% identification KSs
-nsrcs = bbs.createKS( 'NumberOfSourcesKS', {'nSrcs','learned_models/NumberOfSourcesKS/mc3_models_dataset_1',ppRemoveDc} );
+%% nsrcs KS
+if ~bNsrcsGroundtruth
+    nsrcsKs = bbs.createKS( 'NumberOfSourcesKS', {'nSrcs','learned_models/NumberOfSourcesKS/mc3_models_dataset_1',ppRemoveDc} );
+end
 fprintf( '.' );
+%% identification KSs
 if any( strcmp( runningMode, {'segregated identification', 'both'} ) )
     segmModelFileName = '70c4feac861e382413b4c4bfbf895695.mat';
     dirSegr = fullfile( db.tmp, 'learned_models', 'SegmentationKS' );
@@ -39,7 +46,7 @@ if any( strcmp( runningMode, {'segregated identification', 'both'} ) )
                fullfile( dirSegr, segmModelFileName ), ...
                'f' );
     fprintf( '.' );
-    segment = bbs.createKS( 'StreamSegregationKS', ...
+    spatSegrKs = bbs.createKS( 'StreamSegregationKS', ...
         {cleanPathFromRelativeRefs( [pwd '/../../AMLTTP/test/SegmentationTrainerParameters5.yaml'] )} );
     fprintf( '.' );
     for ii = 1 : numel( idSegModels )
@@ -57,17 +64,23 @@ if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
     collectId = bbs.createKS('IntegrateFullstreamIdentitiesKS', {idLeakFactor,inf,idClassThresholds});
 end
 %% ground truth intrusion
-idCheat = bbs.createKS('GroundTruthPlotKS', {labels, onOffsets, activity, azms});
+groundtruthKs = bbs.createKS('GroundTruthKS', {labels, onOffsets, activity, azms, bNsrcsGroundtruth});
 %% knowledge source binding
 bbs.blackboardMonitor.bind({bbs.scheduler}, {bbs.dataConnect}, 'replaceOld', 'AgendaEmpty' );
-bbs.blackboardMonitor.bind({bbs.dataConnect}, {idCheat}, 'replaceOld' );
-bbs.blackboardMonitor.bind({bbs.dataConnect}, {dnnloc}, 'replaceOld' );
-bbs.blackboardMonitor.bind({dnnloc}, {locDec}, 'add' );
-bbs.blackboardMonitor.bind({locDec}, {rot}, 'replaceOld', 'RotateHead' );
+bbs.blackboardMonitor.bind({bbs.dataConnect}, {groundtruthKs}, 'replaceOld' );
+bbs.blackboardMonitor.bind({bbs.dataConnect}, {dnnlocKs}, 'replaceOld' );
+bbs.blackboardMonitor.bind({dnnlocKs}, {locDecKs}, 'add' );
+bbs.blackboardMonitor.bind({locDecKs}, {rot}, 'replaceOld', 'RotateHead' );
+if ~bNsrcsGroundtruth
+    bbs.blackboardMonitor.bind({locDecKs}, {nsrcsKs}, 'replaceOld' );
+end
 if any( strcmp( runningMode, {'segregated identification', 'both'} ) )
-    bbs.blackboardMonitor.bind({locDec}, {nsrcs}, 'replaceOld' );
-    bbs.blackboardMonitor.bind({nsrcs}, {segment}, 'replaceOld' );
-    bbs.blackboardMonitor.bind({segment}, idSegKss, 'replaceOld' );
+    if ~bNsrcsGroundtruth
+        bbs.blackboardMonitor.bind({nsrcsKs}, {spatSegrKs}, 'replaceOld' );
+    else
+        bbs.blackboardMonitor.bind({groundtruthKs}, {spatSegrKs}, 'replaceOld', 'NSrcsTruth' );
+    end
+    bbs.blackboardMonitor.bind({spatSegrKs}, idSegKss, 'replaceOld' );
     bbs.blackboardMonitor.bind({idSegKss{end}}, {collectSegId}, 'replaceOld' );
 end
 if any( strcmp( runningMode, {'frequencyMasked loc', 'both'} ) )
