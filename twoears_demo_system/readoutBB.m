@@ -1,5 +1,7 @@
 function modelData = readoutBB( bbs )
 
+modelData.finishTime = bbs.blackboard.currentSoundTimeIdx;
+
 % NIGENS classes
 classes = {{'alarm'},{'baby'},{'femaleSpeech'},{'fire'},{'crash'},{'dog'},...
            {'engine'},{'footsteps'},{'knock'},{'phone'},{'piano'},...
