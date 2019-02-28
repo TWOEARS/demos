@@ -46,7 +46,7 @@ modelData.locbu_onOffs(:,2) = cat( 1, lochyps(:).sndTmIdx );
 modelData.locbu_onOffs(:,1) = modelData.locbu_onOffs(:,2) - 0.5;
 for jj = 1 : numel( lochyps )
     [modelData.locbu_azms(jj,:),azmsidxs] = sort( ...
-        wrapTo360( lochyps(jj).data.azimuths + lochyps(jj).data.headOrientation ) );
+        wrapTo360( round( lochyps(jj).data.azimuths + lochyps(jj).data.headOrientation ) ) );
     modelData.locbu_pd(jj,:) = lochyps(jj).data.sourcesDistribution(azmsidxs);
 end
 if any( std( modelData.locbu_azms, [], 1 ) > 0 )
