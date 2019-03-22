@@ -23,12 +23,15 @@ modelData.fs_onOffs(:,1) = modelData.fs_onOffs(:,2) - arrayfun( @(a)(a.data(1).c
 idhyps = bbs.blackboard.getData( 'singleBlockObjectHypotheses' );
 modelData.si_dects.onOffs(:,2) = cat( 1, idhyps(:).sndTmIdx );
 modelData.si_dects.onOffs(:,1) = modelData.si_dects.onOffs(:,2) - 0.5;
-idhyps = arrayfun( @(x)(x.data(arrayfun( @(a)(a.d > 0), x.data))), idhyps, 'UniformOutput', false );
+idhyps = arrayfun( @(x)(x.data), idhyps, 'UniformOutput', false );
 for jj = 1 : numel( idhyps )
     headOrientation = bbs.blackboard.getData( 'headOrientation', modelData.si_dects.onOffs(jj,2) );
     for ii = 1:13
         idhyps_jj_ii = idhyps{jj}(arrayfun( @(a)(strcmp(a.label,classes{ii})), idhyps{jj} ));
-        modelData.si_dects.locs{jj,ii} = unique( wrapTo180( [idhyps_jj_ii.loc] + headOrientation.data ) );
+        idhyps_jj_ii_p = idhyps_jj_ii([idhyps_jj_ii.d] > 0);
+        idhyps_jj_ii_n = idhyps_jj_ii([idhyps_jj_ii.d] < 0);
+        modelData.si_dects.locs{jj,ii,1} = unique( wrapTo180( [idhyps_jj_ii_n.loc] + headOrientation.data ) );
+        modelData.si_dects.locs{jj,ii,2} = unique( wrapTo180( [idhyps_jj_ii_p.loc] + headOrientation.data ) );
     end
 end
 

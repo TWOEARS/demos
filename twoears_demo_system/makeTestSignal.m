@@ -44,12 +44,17 @@ labels(cellfun(@isempty,labels)==1) = [];
 
 fprintf( ':' );
 activity = DataProcs.SceneEarSignalProc.detectActivity( 44100, sourceSignal, -40, 50e-3, 20e-3, 10e-3 )';
+la = length( activity );
+num10msSegments = ceil( la / (44100 * 10e-3) );
+activity(num10msSegments*44100/100) = 0;
+activity = reshape( activity, [], num10msSegments );
+activity = max( activity, [], 1 ); % fs := 100
 fprintf( '.' );
-[energy, tFramesSec] = DataProcs.SceneEarSignalProc.runningEnergy( 44100, sourceSignal, 20e-3, 10e-3 );
-energy = energy';
-fprintf( '.' );
-energy = interp1( tFramesSec, energy, (1:numel(sourceSignal))./44100 )';
-fprintf( ':' );
+% [energy, tFramesSec] = DataProcs.SceneEarSignalProc.runningEnergy( 44100, sourceSignal, 20e-3, 10e-3 );
+% energy = energy';
+% fprintf( '.' );
+% energy = interp1( tFramesSec, energy, (1:numel(sourceSignal))./44100 )';
+% fprintf( ':' );
 
-save( testSignalFile, 'sourceSignal', 'onOffsets', 'labels', 'activity' );%, 'energy' );
+save( testSignalFile, 'sourceSignal', 'onOffsets', 'labels', 'activity', '-v7.3' );%, 'energy' );
 fprintf( ';\n' );
