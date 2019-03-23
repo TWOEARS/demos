@@ -84,47 +84,52 @@ ide_ccAvg.blocks.prec = nanMean( arrayfun( @(a)(a.blocks.prec), ide ) );
 fprintf( 'FS class-average block-calc BAC (SENS,SPEC;PREC): %.2f (%.2f,%.2f;%.2f)\n', ide_ccAvg.blocks.bac, ide_ccAvg.blocks.sens, ide_ccAvg.blocks.spec, ide_ccAvg.blocks.prec );
 
 % Segregated id
-segid_results = convertToSegIdResultsFormat( rmf, gt_ccOnoffs_SI, activity );
+[segid_results,scp] = convertToSegIdResultsFormat( rmf, gt_ccOnoffs_SI, activity );
 [sens_b,spec_b] = getPerformanceDecorrMaximumSubset( segid_results.resc_b, ...
-                                                     [segid_results.resc_b.id.posPresent] );
+                                                     [segid_results.resc_b.id.posPresent], ...
+                                                     {}, {}, ...
+                                                     [segid_results.resc_b.id.classIdx,segid_results.resc_b.id.scpId] );
 sens_b = sens_b(2);
 spec_b_npp = spec_b(1);
 spec_b_pp = spec_b(2);
-fprintf( 'SI Sensitivity/stream-wise: %.2f\n', sens_b );
-fprintf( 'SI Specificity/stream-wise/positive present: %.2f\n', spec_b_pp );
-fprintf( 'SI Specificity/stream-wise/no positive present: %.2f\n', spec_b_npp );
-[sens_t,spec_t] = getPerformanceDecorrMaximumSubset( segid_results.resc_t );
+fprintf( 'SI class-average block-calc Sensitivity/stream-wise: %.2f\n', sens_b );
+fprintf( 'SI class-average block-calc Specificity/stream-wise/positive present: %.2f\n', spec_b_pp );
+fprintf( 'SI class-average block-calc Specificity/stream-wise/no positive present: %.2f\n', spec_b_npp );
+[sens_t,spec_t] = getPerformanceDecorrMaximumSubset( segid_results.resc_t, [], ...
+                                                     {}, {}, ...
+                                                     [segid_results.resc_t.id.classIdx,segid_results.resc_t.id.scpId] );
 bac_t = 0.5*sens_t+0.5*spec_t;
-fprintf( 'SI Sensitivity/time-wise: %.2f\n', sens_t );
-fprintf( 'SI Specificity/time-wise: %.2f\n', spec_t );
-fprintf( 'SI BAC/time-wise: %.2f\n', bac_t );
+fprintf( 'SI class-average block-calc BAC/time-wise (SENS,SPEC): %.2f (%.2f,%.2f)\n', bac_t,sens_t,spec_t );
 rs_t_pp = segid_results.resc_t.filter( segid_results.resc_t.id.posPresent, @(x)(x==1) );
 rs_t_ppd = rs_t_pp.filter( rs_t_pp.id.nYp, @(x)(x==1) );
 azmErr_ppd = getAttributeDecorrMaximumSubset( rs_t_ppd, rs_t_ppd.id.azmErr, ...
-                                              [rs_t_ppd.id.scpId], ...
-                                              {[rs_t_ppd.id.classIdx],[],false;},...
-                                              {},...
-                                              [rs_t_ppd.id.fileClassId,rs_t_ppd.id.fileId] );
+                                              [], {}, {},...
+                                              [rs_t_ppd.id.classIdx,rs_t_ppd.id.scpId] );
 azmErr_ppd = (azmErr_ppd-1)*5;
-fprintf( 'SI AzmErr/positive present and detected: %.2f\n', azmErr_ppd );
-nyp_ppd = getAttributeDecorrMaximumSubset( rs_t_ppd, rs_t_ppd.id.nYp );
+fprintf( 'SI class-average block-calc AzmErr/positive present and detected: %.1f°\n', azmErr_ppd );
+nyp_ppd = getAttributeDecorrMaximumSubset( rs_t_ppd, rs_t_ppd.id.nYp, ...
+                                           [], {}, {},...
+                                           [rs_t_ppd.id.classIdx,rs_t_ppd.id.scpId] );
 nyp_ppd = nyp_ppd - 1;
-fprintf( 'SI NEP/positive present and detected: %.2f\n', nyp_ppd - 1 );
+fprintf( 'SI class-average block-calc NEP/positive present and detected: %.2f\n', nyp_ppd - 1 );
 rs_t_npp = segid_results.resc_t.filter( segid_results.resc_t.id.posPresent, @(x)(x==2) );
-nyp_npp = getAttributeDecorrMaximumSubset( rs_t_npp, rs_t_npp.id.nYp );
+nyp_npp = getAttributeDecorrMaximumSubset( rs_t_npp, rs_t_npp.id.nYp, ...
+                                           [], {}, {},...
+                                           [rs_t_npp.id.classIdx,rs_t_npp.id.scpId] );
 nyp_npp = nyp_npp - 1;
-fprintf( 'SI NP/no positive present: %.2f\n', nyp_npp );
+fprintf( 'SI class-average block-calc NP/no positive present: %.2f\n', nyp_npp );
 rs_b_pp = segid_results.resc_b.filter( segid_results.resc_b.id.posPresent, @(x)(x==1) );
 rs_b_ppd = rs_b_pp.filter( rs_b_pp.id.nYp, @(x)(x==1) );
-[placementLlh_scp_azms_ppd, ~, ~, bapr_scp_ppd] = getAzmPlacement( rs_b_ppd, rs_t_ppd, 'estAzm', 0 );
-scp.azms = rmf.refAzimuths;
+[placementLlh_scp_azms_ppd, ~, ~, bapr_scp_ppd] = getAzmPlacement( rs_b_ppd, rs_t_ppd, 'estAzm', 0, false );
 [llhTPplacem_stats_avgNsp,azmsInterp] = computeInterpPlacementLlh( placementLlh_scp_azms_ppd, ...
-                                                                   scp, 5, true, [], [], [], true );
+                                                                   scp, 5, true, [], [], [], false );
 
-fprintf( 'SI BAPR: %.2f\n', bapr_scp_ppd );
+fprintf( 'SI class-average block-calc BAPR: %.2f\n', mean( bapr_scp_ppd ) );
 
 figure;
 hold on;
+azmsInterp(any( isnan( llhTPplacem_stats_avgNsp ), 1 )) = [];
+llhTPplacem_stats_avgNsp(:,any( isnan( llhTPplacem_stats_avgNsp ), 1 )) = [];
 patch( [azmsInterp, flip( azmsInterp )], [llhTPplacem_stats_avgNsp(2,:), flip( llhTPplacem_stats_avgNsp(3,:))], 1, 'facealpha', 0.1, 'edgecolor', 'none', 'facecolor', [0,0,0.8] );
 plot( azmsInterp, llhTPplacem_stats_avgNsp(6,:), 'DisplayName', 'median', 'LineWidth', 2, 'color', [0,0,0.8] );
 ylabel( 'Placement likelihood' );
@@ -174,13 +179,34 @@ function gt_ccOnoffs = extractGtCcOnoffs( rmf, srcIdxs, time_uncovered, classes 
     end
 end
 
-function sid_res = convertToSegIdResultsFormat( bb_results, gt_ccOnoffs_SI, activity )
+function [sid_res, scp] = convertToSegIdResultsFormat( bb_results, gt_ccOnoffs_SI, activity )
     sid_res.resc_b = RescSparse( 'uint32', 'uint8' );
     sid_res.resc_t = RescSparse( 'uint32', 'uint8' );
+    for ss = 1 : numel( bb_results.refAzimuths )
+        scp(ss).azms = [bb_results.refAzimuths(ss) setdiff( bb_results.refAzimuths, bb_results.refAzimuths(ss) )];
+    end
     for cc = 1 : size( bb_results.modelData.si_dects.locs, 2 )
+        scpid = 1;
         for ii = 1 : size( bb_results.modelData.si_dects.locs, 1 )
             startBlockTime = bb_results.modelData.si_dects.onOffs(ii,1);
             endBlockTime = bb_results.modelData.si_dects.onOffs(ii,2);
+            blockInclEvent_gt_ss = false( 1, numel( bb_results.refAzimuths ) );
+            for ss = 1 : numel( bb_results.refAzimuths )
+                blockInclEvent_gt_ss(ss) = ...
+                    ( sum( (gt_ccOnoffs_SI{ss}{cc}(:,1) <= endBlockTime) ...
+                    == (gt_ccOnoffs_SI{ss}{cc}(:,2) >= endBlockTime) ) ...
+                    + sum( (gt_ccOnoffs_SI{ss}{cc}(:,1) <= startBlockTime) ...
+                    == (gt_ccOnoffs_SI{ss}{cc}(:,2) >= startBlockTime) ) ...
+                    + sum( (gt_ccOnoffs_SI{ss}{cc}(:,1) >= startBlockTime) ...
+                    == (gt_ccOnoffs_SI{ss}{cc}(:,2) <= endBlockTime) ) )...
+                    >= 1;
+            end
+            eventActiveOnSrcs = find( blockInclEvent_gt_ss );
+            if numel( eventActiveOnSrcs ) > 1
+                continue; % skip blocks with target sound on more than one source (difficult to evaluate)
+            elseif numel( eventActiveOnSrcs ) == 1
+                scpid = eventActiveOnSrcs;
+            end
             blockAct = activity(floor(startBlockTime*100):min(end,ceil(endBlockTime*100)),:);
             nsGt = max( sum( blockAct, 2 ) );
             streamAzms_cc_ii = [bb_results.modelData.si_dects.locs{ii,cc,:}];
@@ -197,32 +223,24 @@ function sid_res = convertToSegIdResultsFormat( bb_results, gt_ccOnoffs_SI, acti
                 siPred = bb_results.modelData.si_dects.locs{ii,cc,dd};
                 for pp = 1 : numel( siPred )
                     newBlock = PerformanceMeasures.BAC_BAextended.nanRescStruct();
-                    newBlock.scpId = 1;
+                    newBlock.scpId = scpid;
                     newBlock.classIdx = cc;
                     newBlock.nAct = nsGt;
                     newBlock.nYp = numel( bb_results.modelData.si_dects.locs{ii,cc,2} );
                     newBlock.estAzm = siPred(pp);
                     srcidx = find( streamSrcAssignment == newBlock.estAzm );
-                    blockInclEvent_gt = false;
-                    for ss = srcidx
-                        blockInclEvent_gt = blockInclEvent_gt || ...
-                            ( sum( (gt_ccOnoffs_SI{ss}{cc}(:,1) <= endBlockTime) ...
-                            == (gt_ccOnoffs_SI{ss}{cc}(:,2) >= endBlockTime) ) ...
-                            + sum( (gt_ccOnoffs_SI{ss}{cc}(:,1) <= startBlockTime) ...
-                            == (gt_ccOnoffs_SI{ss}{cc}(:,2) >= startBlockTime) ) ...
-                            + sum( (gt_ccOnoffs_SI{ss}{cc}(:,1) >= startBlockTime) ...
-                            == (gt_ccOnoffs_SI{ss}{cc}(:,2) <= endBlockTime) ) )...
-                            >= 1;
-                        if blockInclEvent_gt
-                            srcidx = ss;
-                            break;
-                        end
-                    end
+                    blockInclEvent_gt = any( blockInclEvent_gt_ss(srcidx) );
                     newBlock.posPresent = blockInclEvent_gt;
                     if ~isempty( srcidx )
-                        newBlock.gtAzm = bb_results.refAzimuths(srcidx);
+                        if blockInclEvent_gt
+                            newBlock.gtAzm = bb_results.refAzimuths(eventActiveOnSrcs);
+                        else
+                            newBlock.gtAzm = bb_results.refAzimuths(srcidx);
+                        end
                         newBlock.azmErr = mean( abs( wrapTo180( newBlock.gtAzm - newBlock.estAzm ) ) );
-                        newBlock.gtAzm = newBlock.gtAzm(randi( numel( newBlock.gtAzm ) ));
+                        if numel( newBlock.gtAzm ) > 1
+                            newBlock.gtAzm = newBlock.gtAzm(randi( numel( newBlock.gtAzm ) ));
+                        end
                     end
                     if dd == 1 && ~blockInclEvent_gt
                         newYt(end+1) = -1;
