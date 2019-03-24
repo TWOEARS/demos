@@ -21,6 +21,8 @@ for srcidx = 1 : numel( rmf.labels )
     gt_ccOnoffs_SI{srcidx} = extractGtCcOnoffs( rmf, srcidx, time_uncovered_SI, classes );
 end
 activity = cat( 1, rmf.activity{:} )';
+nActive = sum( activity, 2 );
+fprintf( 'Mean NumSrcs: %.1f\n\n', mean( nActive ) );
 
 % Fullstream id
 for cc = 1 : 13
