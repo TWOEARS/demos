@@ -183,7 +183,7 @@ function [sid_res, scp] = convertToSegIdResultsFormat( bb_results, gt_ccOnoffs_S
     sid_res.resc_b = RescSparse( 'uint32', 'uint8' );
     sid_res.resc_t = RescSparse( 'uint32', 'uint8' );
     for ss = 1 : numel( bb_results.refAzimuths )
-        scp(ss).azms = [bb_results.refAzimuths(ss) setdiff( bb_results.refAzimuths, bb_results.refAzimuths(ss) )];
+        scp(ss).azms = [bb_results.refAzimuths(ss) setdiff( bb_results.refAzimuths, bb_results.refAzimuths(ss) )'];
     end
     for cc = 1 : size( bb_results.modelData.si_dects.locs, 2 )
         scpid = 1;
@@ -208,7 +208,7 @@ function [sid_res, scp] = convertToSegIdResultsFormat( bb_results, gt_ccOnoffs_S
                 scpid = eventActiveOnSrcs;
             end
             blockAct = activity(floor(startBlockTime*100):min(end,ceil(endBlockTime*100)),:);
-            nsGt = max( sum( blockAct, 2 ) );
+            nsGt = sum( max( blockAct, [], 1 ), 2 );
             streamAzms_cc_ii = [bb_results.modelData.si_dects.locs{ii,cc,:}];
             nStreams = numel( streamAzms_cc_ii );
             streamAzms = repmat( wrapTo180( streamAzms_cc_ii' ), 1, nsGt );
