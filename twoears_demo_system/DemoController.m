@@ -19,12 +19,14 @@ classdef DemoController < handle
         bStopNow = false;
         
         % Define localisation demo parameters
-        bSolveConfusion = true; % flag for rotating head/body during localisation to solve confusion
+        bLocDecCmdRotate = false; % flag for rotating head/body during localisation to solve confusion
         bFrontLocationOnly = false; % flag for localiation in the frontal plane only        
         bSimulation = true; % If true, use simulation instead of robot
         nsrcsGroundtruth = true;
         bUseAdream = false;
         bFsInitSI = false;
+        bMaxLatDistRotate = true;
+        bTestSet = false;
         
         % Energy threshold (average ratemap) for valid frames in
         % localisation
@@ -71,7 +73,7 @@ classdef DemoController < handle
                 [idModels(1:numel(idModels)).dir] = deal( idModelsDir );
             end
             
-            [sourceSets, sourceVolumes] = setupScenes();
+            [sourceSets, sourceVolumes] = setupScenes( obj.bTestSet );
             
             for ii = 1:length(sourceSets)
                 
@@ -92,9 +94,10 @@ classdef DemoController < handle
                 % Create blackboard
                 [obj.bbs, obj.locDecKS] = buildBBS(obj.robot, ...
                     obj.bFrontLocationOnly, ...
-                    obj.bSolveConfusion, ...
+                    obj.bLocDecCmdRotate, ...
                     obj.nsrcsGroundtruth, ...
                     obj.bFsInitSI, ...
+                    obj.bMaxLatDistRotate, ...
                     idModels, segidModels, ...
                     16000, obj.runningMode, ...
                     labels,onOffsets,activity,refAzimuths);
@@ -132,10 +135,10 @@ classdef DemoController < handle
             obj.afeVis.reset;
         end
         
-        function setSolveConfusion(obj, bSolveConfusion)
-            obj.bSolveConfusion = bSolveConfusion;
+        function setSolveConfusion(obj, bLocDecCmdRotate)
+            obj.bLocDecCmdRotate = bLocDecCmdRotate;
             if ~isempty(obj.locDecKS)
-                obj.locDecKS.setSolveConfusion(bSolveConfusion);
+                obj.locDecKS.setSolveConfusion(bLocDecCmdRotate);
             end
         end
         

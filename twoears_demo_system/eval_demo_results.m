@@ -164,6 +164,7 @@ function gt_ccOnoffs = extractGtCcOnoffs( rmf, srcIdxs, time_uncovered, classes 
                 end
                 if time_uncovered(kk,1) <= gt_ccOnoffs{cc}(jj,1) && time_uncovered(kk,2) >= gt_ccOnoffs{cc}(jj,2)
                     gt_ccOnoffs{cc}(jj,:) = [];
+                    break;
                 elseif time_uncovered(kk,1) <= gt_ccOnoffs{cc}(jj,1) && time_uncovered(kk,2) < gt_ccOnoffs{cc}(jj,2)
                     gt_ccOnoffs{cc}(jj,1) = time_uncovered(kk,2);
                 elseif time_uncovered(kk,1) > gt_ccOnoffs{cc}(jj,1) && time_uncovered(kk,2) >= gt_ccOnoffs{cc}(jj,2)

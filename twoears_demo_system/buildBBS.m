@@ -1,5 +1,6 @@
-function [bbs,locDecKs]  = buildBBS(sim, bFrontLocationOnly, bSolveConfusion, ...
+function [bbs,locDecKs]  = buildBBS(sim, bFrontLocationOnly, bLocDecCmdRotate, ...
                                   bNsrcsGroundtruth, bFsInitSI, ...
+                                  bMaxLatDist, ...
                                   idModels, idSegModels, fs, runningMode, ...
                                   labels, onOffsets, activity, azms )
 
@@ -12,6 +13,9 @@ ppRemoveDc = false;
 
 bbs = BlackboardSystem(1);
 bbs.setRobotConnect(sim);
+
+bLocDecCmdRotate = bLocDecCmdRotate && ~bMaxLatDist;
+
 %% localization KSs
 bbs.setDataConnect('AuditoryFrontEndKS', fs, 0.5);
 if bFrontLocationOnly
@@ -20,10 +24,13 @@ else
     dnnlocKs = bbs.createKS('DnnLocationKS', {'MCT-DIFFUSE'});
 end
 fprintf( '.' );
-locDecKs = bbs.createKS( 'LocalisationDecisionKS', {bSolveConfusion,0.5} );
+locDecKs = bbs.createKS( 'LocalisationDecisionKS', {bLocDecCmdRotate,0.5} );
 fprintf( '.' );
 rot = bbs.createKS('HeadRotationKS', {sim});
 fprintf( '.' );
+if bMaxLatDist
+    maxLatDistRot = bbs.createKS('MaxLatDistanceHeadRotationKS', {sim});
+end
 %%
 idClassThresholds.fire = 0.5;
 segIdClassThresholds.fire = 0.5;
@@ -78,6 +85,9 @@ bbs.blackboardMonitor.bind({bbs.scheduler}, {bbs.dataConnect}, 'replaceOld', 'Ag
 bbs.blackboardMonitor.bind({bbs.dataConnect}, {dnnlocKs}, 'replaceOld' );
 bbs.blackboardMonitor.bind({dnnlocKs}, {locDecKs}, 'add' );
 bbs.blackboardMonitor.bind({locDecKs}, {rot}, 'replaceOld', 'RotateHead' );
+if bMaxLatDist
+    bbs.blackboardMonitor.bind({locDecKs}, {maxLatDistRot}, 'replaceOld' );
+end
 
 bbs.blackboardMonitor.bind({locDecKs}, {groundtruthKs}, 'replaceOld' );
 if ~bNsrcsGroundtruth

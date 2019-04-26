@@ -22,7 +22,7 @@ function varargout = twoears_demo_system(varargin)
 
 % Edit the above text to modify the response to help twoears_demo_system
 
-% Last Modified by GUIDE v2.5 14-Feb-2019 14:47:49
+% Last Modified by GUIDE v2.5 26-Apr-2019 23:25:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -217,5 +217,22 @@ function checkboxFsInitSegId_Callback(hObject, eventdata, handles)
 handles.ctrl.bFsInitSI = get( hObject, 'Value' );
 
 
+% --- Executes on button press in checkboxUseMaxLatDistRot.
+function checkboxUseMaxLatDistRot_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxUseMaxLatDistRot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxUseMaxLatDistRot
+
+handles.ctrl.bMaxLatDistRotate = get( hObject, 'Value' );
 
 
+% --- Executes on button press in checkboxUseTestSet.
+function checkboxUseTestSet_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxUseTestSet (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxUseTestSet
+handles.ctrl.bTestSet = get( hObject, 'Value' );
