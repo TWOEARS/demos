@@ -1,6 +1,6 @@
 function [bbs,locDecKs]  = buildBBS(sim, bFrontLocationOnly, bLocDecCmdRotate, ...
                                   bNsrcsGroundtruth, bFsInitSI, ...
-                                  bMaxLatDist, ...
+                                  bMaxLatDist, bRndRotation, ...
                                   idModels, idSegModels, fs, runningMode, ...
                                   labels, onOffsets, activity, azms )
 
@@ -14,7 +14,7 @@ ppRemoveDc = false;
 bbs = BlackboardSystem(1);
 bbs.setRobotConnect(sim);
 
-bLocDecCmdRotate = bLocDecCmdRotate && ~bMaxLatDist;
+bLocDecCmdRotate = bLocDecCmdRotate && ~bMaxLatDist && ~bRndRotation;
 
 %% localization KSs
 bbs.setDataConnect('AuditoryFrontEndKS', fs, 0.5);
@@ -30,6 +30,9 @@ rot = bbs.createKS('HeadRotationKS', {sim});
 fprintf( '.' );
 if bMaxLatDist
     maxLatDistRot = bbs.createKS('MaxLatDistanceHeadRotationKS', {sim});
+end
+if bRndRotation
+    rndRot = bbs.createKS('RandomHeadRotationKS', {sim});
 end
 %%
 idClassThresholds.fire = 0.5;
@@ -87,6 +90,9 @@ bbs.blackboardMonitor.bind({dnnlocKs}, {locDecKs}, 'add' );
 bbs.blackboardMonitor.bind({locDecKs}, {rot}, 'replaceOld', 'RotateHead' );
 if bMaxLatDist
     bbs.blackboardMonitor.bind({locDecKs}, {maxLatDistRot}, 'replaceOld' );
+end
+if bRndRotation
+    bbs.blackboardMonitor.bind({locDecKs}, {rndRot}, 'replaceOld' );
 end
 
 bbs.blackboardMonitor.bind({locDecKs}, {groundtruthKs}, 'replaceOld' );

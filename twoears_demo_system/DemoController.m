@@ -17,6 +17,7 @@ classdef DemoController < handle
         % Define simulator variables
         refSourceAzimuths; % Reference source azimuths
         bStopNow = false;
+        startScene = 1;
         
         % Define localisation demo parameters
         bLocDecCmdRotate = false; % flag for rotating head/body during localisation to solve confusion
@@ -27,6 +28,7 @@ classdef DemoController < handle
         bFsInitSI = false;
         bMaxLatDistRotate = true;
         bTestSet = false;
+        bRndRotation = false;
         
         % Energy threshold (average ratemap) for valid frames in
         % localisation
@@ -75,7 +77,7 @@ classdef DemoController < handle
             
             [sourceSets, sourceVolumes] = setupScenes( obj.bTestSet );
             
-            for ii = 1:length(sourceSets)
+            for ii = obj.startScene:length(sourceSets)
                 
                 % Reset controller
                 obj.reset();
@@ -98,6 +100,7 @@ classdef DemoController < handle
                     obj.nsrcsGroundtruth, ...
                     obj.bFsInitSI, ...
                     obj.bMaxLatDistRotate, ...
+                    obj.bRndRotation, ...
                     idModels, segidModels, ...
                     16000, obj.runningMode, ...
                     labels,onOffsets,activity,refAzimuths);

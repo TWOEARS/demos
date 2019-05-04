@@ -22,7 +22,7 @@ function varargout = twoears_demo_system(varargin)
 
 % Edit the above text to modify the response to help twoears_demo_system
 
-% Last Modified by GUIDE v2.5 26-Apr-2019 23:25:34
+% Last Modified by GUIDE v2.5 27-Apr-2019 20:26:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -109,6 +109,12 @@ function checkboxHeadRotation_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkboxHeadRotation
 handles.ctrl.setSolveConfusion(get(hObject,'Value'));
+if handles.ctrl.bLocDecCmdRotate
+    set(handles.checkboxUseMaxLatDistRot, 'Value', 0);
+    set(handles.checkboxRndRotation, 'Value', 0);
+    handles.ctrl.bMaxLatDistRotate = false;
+    handles.ctrl.bRndRotation = false;
+end
 
 
 % --- Executes on button press in checkboxFrontalPlane.
@@ -226,6 +232,12 @@ function checkboxUseMaxLatDistRot_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkboxUseMaxLatDistRot
 
 handles.ctrl.bMaxLatDistRotate = get( hObject, 'Value' );
+if handles.ctrl.bMaxLatDistRotate
+    set(handles.checkboxHeadRotation, 'Value', 0);
+    set(handles.checkboxRndRotation, 'Value', 0);
+    handles.ctrl.bLocDecCmdRotate = false;
+    handles.ctrl.bRndRotation = false;
+end
 
 
 % --- Executes on button press in checkboxUseTestSet.
@@ -236,3 +248,43 @@ function checkboxUseTestSet_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkboxUseTestSet
 handles.ctrl.bTestSet = get( hObject, 'Value' );
+
+
+% --- Executes on button press in checkboxRndRotation.
+function checkboxRndRotation_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxRndRotation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxRndRotation
+handles.ctrl.bRndRotation = get( hObject, 'Value' );
+if handles.ctrl.bRndRotation
+    set(handles.checkboxUseMaxLatDistRot, 'Value', 0);
+    set(handles.checkboxHeadRotation, 'Value', 0);
+    handles.ctrl.bLocDecCmdRotate = false;
+    handles.ctrl.bMaxLatDistRotate = false;
+end
+
+
+% --- Executes on selection change in popupmenuStartScene.
+function popupmenuStartScene_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenuStartScene (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenuStartScene contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenuStartScene
+handles.ctrl.startScene = get(hObject,'Value');
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenuStartScene_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenuStartScene (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
