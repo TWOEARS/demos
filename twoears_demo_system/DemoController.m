@@ -42,14 +42,14 @@ classdef DemoController < handle
     methods
         function obj = DemoController(gui)
             startTwoEars( fullfile( pwd, 'Config.xml' ) );
-            
-            % Setup visualisers
-            handles = guidata(gui);
-            obj.bbVis = VisualiserBlackboard(handles.axesConsole);
-            obj.afeVis = VisualiserAFE(handles.uipanelAFE);
-            obj.locVis = VisualiserIdentityLocalisation(handles.axesRoom);
-            
-            obj.reset();
+            if nargin >= 1 &&  ~isempty( gui )
+                % Setup visualisers
+                handles = guidata(gui);
+                obj.bbVis = VisualiserBlackboard(handles.axesConsole);
+                obj.afeVis = VisualiserAFE(handles.uipanelAFE);
+                obj.locVis = VisualiserIdentityLocalisation(handles.axesRoom);
+                obj.reset();
+            end
         end
                 
         % Run the blackboard
@@ -79,9 +79,6 @@ classdef DemoController < handle
             
             for ii = obj.startScene:length(sourceSets)
                 
-                % Reset controller
-                obj.reset();
-                
                 sourceList = sourceSets{ii};
                 [obj.robot, refAzimuths, robotOrientation,labels,onOffsets,activity] = ...
                     setupBinauralSimulator(sourceList, sourceVolumes{ii}, obj.bUseAdream);
@@ -108,16 +105,19 @@ classdef DemoController < handle
                 obj.bbs.setEnergyThreshold(obj.energyThresholdSimulation);
                 
                 % Set visualisers
-                obj.bbs.setVisualiser(obj.bbVis);
-                obj.bbs.setLocVis(obj.locVis);
-                obj.bbs.setAfeVis(obj.afeVis);
+                if ~isempty( obj.bbVis )
+                    obj.reset();
+                    obj.bbs.setVisualiser(obj.bbVis);
+                    obj.bbs.setLocVis(obj.locVis);
+                    obj.bbs.setAfeVis(obj.afeVis);
+                end
                 
                 % Run the blackboard system
                 obj.bbs.run();
                 
                 obj.robot.shutdown();
                 
-                modelData = readoutBB( obj.bbs );
+                modelData = readoutBB( obj.bbs ); %#ok<NASGU>
                 save( ['results_' num2str( ii )], 'modelData', 'labels', 'onOffsets', 'activity', 'refAzimuths' );
             end
             % End of the simulation
@@ -133,9 +133,11 @@ classdef DemoController < handle
         end
 
         function reset(obj)
-            obj.bbVis.reset;
-            obj.locVis.reset;
-            obj.afeVis.reset;
+            if ~isempty( obj.bbVis )
+                obj.bbVis.reset;
+                obj.locVis.reset;
+                obj.afeVis.reset;
+            end
         end
         
         function setSolveConfusion(obj, bLocDecCmdRotate)
