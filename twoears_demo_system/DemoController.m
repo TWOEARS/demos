@@ -118,7 +118,29 @@ classdef DemoController < handle
                 obj.robot.shutdown();
                 
                 modelData = readoutBB( obj.bbs ); %#ok<NASGU>
-                save( ['results_' num2str( ii )], 'modelData', 'labels', 'onOffsets', 'activity', 'refAzimuths' );
+                saveName_str = '';
+                if obj.bUseAdream
+                    saveName_str = [saveName_str '.adream'];
+                end
+                if obj.bTestSet
+                    saveName_str = [saveName_str '_test'];
+                end
+                if obj.bLocDecCmdRotate
+                    saveName_str = [saveName_str '_headMovingLocRule'];
+                elseif obj.bMaxLatDistRotate
+                    saveName_str = [saveName_str '_headMovingMLD'];
+                elseif obj.bRndRotation
+                    saveName_str = [saveName_str '_headMovingRND'];
+                else
+                    saveName_str = [saveName_str '_headFixed'];
+                end
+                if obj.nsrcsGroundtruth
+                    saveName_str = [saveName_str '_nsGt'];
+                else
+                    saveName_str = [saveName_str '_nsModel'];
+                end
+                save( ['results_' num2str( ii ) saveName_str], ...
+                                    'modelData', 'labels', 'onOffsets', 'activity', 'refAzimuths' );
             end
             % End of the simulation
         end
