@@ -49,7 +49,8 @@ if bUseAdream
     robotOrientation = robotPos(1); % World frame
 else
     hrir = 'impulse_responses/qu_kemar_anechoic/QU_KEMAR_anechoic_3m.sofa';
-    sourceAzms = [-5 +55 +115 +175];
+    sourceAzms = [+180 +150 +120 +90];
+%     sourceAzms = [-5 +55 +115 +175];
 %     sourceAzms = [-10 -110 +160 +45];
     robotOrientation = 0;
 end
